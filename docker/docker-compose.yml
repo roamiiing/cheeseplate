@@ -1,0 +1,23 @@
+# This compose-file is intended to be used for development just to run the needed databases.
+# In the future, docker configuration will be extended to run
+
+version: '3.9'
+
+services:
+  pg:
+    image: arm64v8/postgres:14.2
+    environment:
+      POSTGRES_DB: 'granatdev'
+      POSTGRES_USER: 'granatdevuser'
+      POSTGRES_PASSWORD: 'supersecure'
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - ./localvolumes/pg:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - granetwork
+
+networks:
+  granetwork:
+    driver: bridge

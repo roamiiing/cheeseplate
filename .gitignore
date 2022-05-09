@@ -1,0 +1,11 @@
+node_modules
+
+api/_build
+public/_
+dependencygraph.png
+
+.vercel
+docker/localvolumes
+.env
+
+dist
