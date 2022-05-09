@@ -7,8 +7,29 @@ datasource db {
   url      = env("PG_PRISMA_DATABASE_URL")
 }
 
+model Chat {
+  telegramId BigInt @id
+  Tag        Tag[]
+  User       User[]
+}
+
 model Tag {
-  id        Int      @id @default(autoincrement())
-  tag       String   @unique
-  usernames String[]
+  id             Int    @id @default(autoincrement())
+  tag            String
+  chatTelegramId BigInt
+  chat           Chat   @relation(fields: [chatTelegramId], references: [telegramId])
+  users          User[]
+
+  @@unique([tag, chatTelegramId])
+}
+
+model User {
+  id             Int    @id @default(autoincrement())
+  telegramId     BigInt
+  displayName    String
+  tags           Tag[]
+  chatTelegramId BigInt
+  chat           Chat   @relation(fields: [chatTelegramId], references: [telegramId])
+
+  @@unique([telegramId, chatTelegramId])
 }
