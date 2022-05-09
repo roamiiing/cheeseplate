@@ -19,7 +19,7 @@ export default defineConfig({
     },
     outDir: path.resolve(__dirname, '../dist'),
     rollupOptions: {
-      external: [...Object.keys(pkg.dependencies), 'path'],
+      external: [...Object.keys(pkg.dependencies), 'path', /^@prisma\/client/],
     },
     minify: 'terser',
     // TODO: upload source maps to sentry

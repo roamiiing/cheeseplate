@@ -55,6 +55,10 @@ appContainer.cradle.bot.command('/help', ctx => {
       command: 'taglist',
       description: 'Посмотреть все свои теги',
     },
+    {
+      command: 'roll',
+      description: 'Наванговать',
+    },
   ]
 
   ctx.replyWithHTML(
@@ -74,6 +78,7 @@ ${commands
 })
 
 appContainer.cradle.configureUsers()
+appContainer.cradle.configureRandom()
 appContainer.cradle.configureTags()
 
 appContainer.cradle.bot.catch((err, ctx) => {

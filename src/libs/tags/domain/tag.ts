@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const TAG_SYMBOL = '#'
 
-export const ALLOWED_SYMBOLS = '[\\w]',
+export const ALLOWED_SYMBOLS = '[\\wа-яё]',
   TAG_REGEX = new RegExp(`\\${TAG_SYMBOL}${ALLOWED_SYMBOLS}+`, 'gi'),
   ALLOWED_SYMBOLS_REGEX = new RegExp(`^${ALLOWED_SYMBOLS}+$`, 'gi')
 
