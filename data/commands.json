@@ -1,0 +1,37 @@
+[
+  {
+    "command": "agree",
+    "description": "Начать работу с ботом. После этого вы будете зарегистрированы в системе бота"
+  },
+  {
+    "command": "disagree",
+    "description": "Удалить себя из системы бота"
+  },
+  {
+    "command": "settag",
+    "description": "Установить себе тег. Теги могут содержать только латиницу, кириллицу, а также цифры и _. После этого вас можно будет пинговать через <pre>#amogus</pre>",
+    "example": "/settag amogus"
+  },
+  {
+    "command": "deltag",
+    "description": "Снять с себя тег, добавленный ранее",
+    "example": "/deltag amogus"
+  },
+  {
+    "command": "setname",
+    "description": "Переименоваться",
+    "example": "/setname aboba"
+  },
+  {
+    "command": "taglist",
+    "description": "Посмотреть все свои теги"
+  },
+  {
+    "command": "roll",
+    "description": "Наванговать"
+  },
+  {
+    "command": "ben",
+    "description": "Hohoho. No."
+  }
+]

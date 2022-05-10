@@ -14,6 +14,7 @@
     "start": "npm run dev",
     "prisma": "prisma",
     "tsc": "tsc",
+    "botfather-commands": "zx ./scripts/botfather-commands.mjs",
     "dep-graph": "depcruise --ts-config tsconfig.json --include-only \"^src\" --output-type dot src | dot -T png > dependencygraph.png"
   },
   "author": "",
@@ -41,7 +42,8 @@
     "typescript": "^4.5.4",
     "vite": "^2.7.10",
     "vite-tsconfig-paths": "^3.4.1",
-    "vitest": "^0.2.3"
+    "vitest": "^0.2.3",
+    "zx": "^6.1.0"
   },
   "dependencies": {
     "@prisma/client": "^3.10.0",

@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client'
 import { asFunction, asValue, createContainer, InjectionMode } from 'awilix'
 import { Telegraf } from 'telegraf'
 import { bot } from './bot'
+import { configureAdditionalCommands } from './misc'
 
 export const appContainer = createContainer<{
   bot: Telegraf
@@ -12,6 +13,7 @@ export const appContainer = createContainer<{
   configureUsers: ReturnType<typeof configureUsers>
   configureTags: ReturnType<typeof configureTags>
   configureRandom: ReturnType<typeof configureRandom>
+  configureAdditionalCommands: ReturnType<typeof configureAdditionalCommands>
 }>({
   injectionMode: InjectionMode.PROXY,
 }).register({
@@ -20,4 +22,5 @@ export const appContainer = createContainer<{
   configureUsers: asFunction(configureUsers),
   configureTags: asFunction(configureTags),
   configureRandom: asFunction(configureRandom),
+  configureAdditionalCommands: asFunction(configureAdditionalCommands),
 })

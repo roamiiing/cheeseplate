@@ -71,15 +71,6 @@ export const setTagForUser =
             telegramId: chatId,
           },
         },
-        // tag,
-        // users: {
-        //   connect: {
-        //     telegramId_chatTelegramId: {
-        //       telegramId: userId,
-        //       chatTelegramId: chatId,
-        //     },
-        //   },
-        // },
       },
     })
 
@@ -142,52 +133,6 @@ export const getUsersWithTags =
         (v, i, a) => a.findIndex(vv => vv.telegramId === v.telegramId) === i,
       )
   }
-
-// export type SetTagForUsernameResult = {
-//   newlyInserted: boolean
-// }
-
-// export const setTagForUsername =
-//   ({ prismaClient }: CrudDeps) =>
-//   async (username: string, tag: string): Promise<SetTagForUsernameResult> => {
-//     const alreadyHas = await prismaClient.tag.findFirst({
-//       where: {
-//         tag,
-//         usernames: {
-//           has: username,
-//         },
-//       },
-//     })
-
-//     if (alreadyHas) {
-//       return {
-//         newlyInserted: false,
-//       }
-//     }
-
-//     await prismaClient.tag.upsert({
-//       where: {
-//         tag,
-//       },
-//       update: {
-//         usernames: {
-//           push: username,
-//         },
-//       },
-//       create: {
-//         usernames: [username],
-//         tag,
-//       },
-//     })
-
-//     return {
-//       newlyInserted: true,
-//     }
-//   }
-
-// export type DeleteTagForUsernameResult = {
-//   deleted: boolean
-// }
 
 export const deleteTagForUser =
   ({ prismaClient }: CrudDeps): DeleteTagDeps['deleteTagForUser'] =>
