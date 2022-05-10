@@ -1,10 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { asFunction, asValue, createContainer, InjectionMode } from 'awilix'
 import {
-  AgreeDeps,
-  agreeUseCase,
-  DisagreeDeps,
-  disagreeUseCase,
   SetNameDeps,
   setNameUseCase,
   aboutUseCase,
@@ -12,11 +8,9 @@ import {
 } from '@/libs/users/application'
 import {
   CrudDeps,
-  deleteUser,
   getUserInfo,
   getUserInfoByDisplayName,
   getUserInfoByTelegramUsername,
-  insertUser,
   setUserName,
 } from './users.db'
 import { Telegraf } from 'telegraf'
@@ -28,13 +22,9 @@ export type UsersDeps = {
 
 export const createUsersContainer = ({ prismaClient, bot }: UsersDeps) => {
   return createContainer<
-    AgreeDeps &
-      DisagreeDeps &
-      SetNameDeps &
+    SetNameDeps &
       AboutDeps &
       CrudDeps & {
-        agreeUseCase: ReturnType<typeof agreeUseCase>
-        disagreeUseCase: ReturnType<typeof disagreeUseCase>
         setNameUseCase: ReturnType<typeof setNameUseCase>
         aboutUseCase: ReturnType<typeof aboutUseCase>
       }
@@ -44,13 +34,9 @@ export const createUsersContainer = ({ prismaClient, bot }: UsersDeps) => {
     prismaClient: asValue(prismaClient),
     bot: asValue(bot),
 
-    agreeUseCase: asFunction(agreeUseCase),
-    disagreeUseCase: asFunction(disagreeUseCase),
     setNameUseCase: asFunction(setNameUseCase),
     aboutUseCase: asFunction(aboutUseCase),
 
-    deleteUser: asFunction(deleteUser),
-    insertUser: asFunction(insertUser),
     setUserName: asFunction(setUserName),
     getUserInfo: asFunction(getUserInfo),
     getUserInfoByDisplayName: asFunction(getUserInfoByDisplayName),

@@ -1,9 +1,5 @@
 import { wrapUseCase } from '@/libs/shared/telegraf'
-import {
-  AGREE_COMMAND,
-  DISAGREE_COMMAND,
-  SET_NAME_COMMAND,
-} from '@/libs/users/application'
+import { SET_NAME_COMMAND } from '@/libs/users/application'
 import { PrismaClient } from '@prisma/client'
 import { Telegraf } from 'telegraf'
 import { ABOUT_COMMAND } from '../application/about.use-case'
@@ -20,33 +16,6 @@ export const configureUsers =
     const usersContainer = createUsersContainer({
       prismaClient,
       bot,
-    })
-
-    bot.command(AGREE_COMMAND, async ctx => {
-      await wrapUseCase(ctx, usersContainer.cradle.agreeUseCase)
-    })
-
-    // TODO: вынести middlewares в соответствующие ограниченные контексты
-    bot.use(async (ctx, next) => {
-      const chatId = ctx.message!.chat.id
-      const userId = ctx.message!.from.id
-
-      const exists = await prismaClient.user.findUnique({
-        where: {
-          telegramId_chatTelegramId: {
-            telegramId: userId,
-            chatTelegramId: chatId,
-          },
-        },
-      })
-
-      if (exists) {
-        return next()
-      }
-    })
-
-    bot.command(DISAGREE_COMMAND, async ctx => {
-      await wrapUseCase(ctx, usersContainer.cradle.disagreeUseCase)
     })
 
     bot.command(ABOUT_COMMAND, async ctx => {
