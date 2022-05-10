@@ -9,7 +9,6 @@ export type RollInput = {
 export const rollUseCase =
   (): UseCase<RollInput> =>
   async ({ input: { message } }) => {
-    console.log('ROlling')
     const prob = Math.round(Math.random() * 100)
 
     if (!message) return { message: `${prob}%` }

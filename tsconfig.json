@@ -3,6 +3,7 @@
     "esModuleInterop": true,
     "strict": true,
     "baseUrl": ".",
+    "downlevelIteration": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "types": ["vite/client"],

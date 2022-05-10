@@ -1,8 +1,12 @@
 import { UseCaseContext } from './context'
 
-export type UseCaseResult = {
-  message: string
-}
+export type UseCaseResult =
+  | {
+      message: string
+    }
+  | {
+      gif: string
+    }
 
 export type UseCase<Input> = (
   ctx: UseCaseContext<Input>,

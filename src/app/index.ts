@@ -59,6 +59,10 @@ appContainer.cradle.bot.command('/help', ctx => {
       command: 'roll',
       description: 'Наванговать',
     },
+    {
+      command: 'ben',
+      description: 'Hohoho. No.',
+    },
   ]
 
   ctx.replyWithHTML(
@@ -82,7 +86,7 @@ appContainer.cradle.configureRandom()
 appContainer.cradle.configureTags()
 
 appContainer.cradle.bot.catch((err, ctx) => {
-  console.log(err, ctx)
+  console.error(err, ctx)
 })
 
 appContainer.cradle.bot.launch()
