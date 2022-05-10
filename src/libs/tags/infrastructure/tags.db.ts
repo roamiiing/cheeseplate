@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma, PrismaClient } from '@prisma/client'
 import {
   DeleteTagDeps,
   ListTagsDeps,
@@ -179,22 +179,14 @@ export const deleteTagForUser =
     }
   }
 
-export const listTagsForUser =
-  ({ prismaClient }: CrudDeps): ListTagsDeps['listTagsForUser'] =>
-  async (userId, chatId) => {
-    const result = await prismaClient.user.findUnique({
-      select: {
-        tags: true,
-      },
+export const listTags =
+  ({ prismaClient }: CrudDeps): ListTagsDeps['listTags'] =>
+  async chatId => {
+    const result = await prismaClient.tag.findMany({
       where: {
-        telegramId_chatTelegramId: {
-          telegramId: userId,
-          chatTelegramId: chatId,
-        },
+        chatTelegramId: chatId,
       },
     })
 
-    if (!result) return []
-
-    return result.tags.map(v => v.tag)
+    return result.map(v => v.tag)
   }

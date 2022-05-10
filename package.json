@@ -21,6 +21,8 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.8",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.3",
     "@types/validator": "^13.7.1",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.10.2",
@@ -55,6 +57,8 @@
     "fastify-swagger": "^4.15.0",
     "fp-ts": "^2.11.8",
     "jsonwebtoken": "^8.5.1",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
     "telegraf": "^4.8.1",
     "ts-pattern": "^3.3.5",
     "zod": "^3.14.2"

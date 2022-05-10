@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 export const Username = z
-  .string()
+  .string({
+    required_error: 'Не указано имя',
+  })
   .min(2, 'Слишком короткое имя, минимум 2 символа')
   .max(20, 'Слишком длинное имя, максимум 20 символов')
   .regex(

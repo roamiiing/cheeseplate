@@ -6,6 +6,7 @@ import {
 } from '@/libs/users/application'
 import { PrismaClient } from '@prisma/client'
 import { Telegraf } from 'telegraf'
+import { ABOUT_COMMAND } from '../application/about.use-case'
 import { createUsersContainer } from './users.container'
 
 export type UsersControllerDeps = {
@@ -18,7 +19,8 @@ export const configureUsers =
   () => {
     const usersContainer = createUsersContainer({
       prismaClient,
-    })()
+      bot,
+    })
 
     bot.command(AGREE_COMMAND, async ctx => {
       await wrapUseCase(ctx, usersContainer.cradle.agreeUseCase)
@@ -45,6 +47,15 @@ export const configureUsers =
 
     bot.command(DISAGREE_COMMAND, async ctx => {
       await wrapUseCase(ctx, usersContainer.cradle.disagreeUseCase)
+    })
+
+    bot.command(ABOUT_COMMAND, async ctx => {
+      // TODO: получать при помощи entity
+      const [, displayName] = ctx.message.text.split(/\s+/)
+
+      await wrapUseCase(ctx, usersContainer.cradle.aboutUseCase, {
+        displayName,
+      })
     })
 
     bot.command(SET_NAME_COMMAND, async ctx => {

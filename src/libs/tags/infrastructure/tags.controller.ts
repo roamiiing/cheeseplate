@@ -5,6 +5,7 @@ import {
   SET_TAG_COMMAND,
   LIST_TAGS_COMMAND,
   DELETE_TAG_COMMAND,
+  DRY_PING_COMMAND,
 } from '@/libs/tags/application'
 import { createTagsContainer } from './tags.container'
 import { TAG_REGEX, TAG_SYMBOL } from '@/libs/tags/domain'
@@ -31,6 +32,15 @@ export const configureTags =
       const [, tag] = ctx.message.text.split(/\s+/)
 
       await wrapUseCase(ctx, tagsContainer.cradle.deleteTagUseCase, { tag })
+    })
+
+    bot.command(DRY_PING_COMMAND, async ctx => {
+      const [, ...tags] = ctx.message.text.split(/\s+/)
+
+      await wrapUseCase(ctx, tagsContainer.cradle.pingUseCase, {
+        tags,
+        dry: true,
+      })
     })
 
     bot.command(LIST_TAGS_COMMAND, async ctx => {

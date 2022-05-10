@@ -24,12 +24,15 @@ model Tag {
 }
 
 model User {
-  id             Int    @id @default(autoincrement())
-  telegramId     BigInt
-  displayName    String
-  tags           Tag[]
-  chatTelegramId BigInt
-  chat           Chat   @relation(fields: [chatTelegramId], references: [telegramId])
+  id               Int     @id @default(autoincrement())
+  telegramId       BigInt
+  displayName      String
+  telegramUsername String?
+  tags             Tag[]
+  chatTelegramId   BigInt
+  chat             Chat    @relation(fields: [chatTelegramId], references: [telegramId])
 
+  @@unique([telegramUsername, chatTelegramId])
   @@unique([telegramId, chatTelegramId])
+  @@unique([displayName, chatTelegramId])
 }

@@ -19,7 +19,12 @@ export default defineConfig({
     },
     outDir: path.resolve(__dirname, '../dist'),
     rollupOptions: {
-      external: [...Object.keys(pkg.dependencies), 'path', /^@prisma\/client/],
+      external: [
+        ...Object.keys(pkg.dependencies),
+        'path',
+        /^@prisma\/client/,
+        /^react-dom/,
+      ],
     },
     minify: 'terser',
     // TODO: upload source maps to sentry

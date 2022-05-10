@@ -43,6 +43,20 @@ ${commands
       })
 
       if (exists) {
+        if (ctx.message) {
+          await prismaClient.user.update({
+            where: {
+              telegramId_chatTelegramId: {
+                telegramId: ctx.message.from.id,
+                chatTelegramId: ctx.message.chat.id,
+              },
+            },
+            data: {
+              telegramUsername: ctx.message.from.username,
+            },
+          })
+        }
+
         return next()
       }
     })

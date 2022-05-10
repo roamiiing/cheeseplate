@@ -1,7 +1,7 @@
 import { mapZodError } from '@/libs/shared/validation'
 import { UseCase } from '@/libs/shared/workflow'
 import { Chat, User } from '@prisma/client'
-import { Username } from '../domain/user'
+import { Username } from '@/libs/users/domain'
 
 export const SET_NAME_COMMAND = '/setname'
 
@@ -10,7 +10,9 @@ export type SetNameDeps = {
     userId: User['telegramId'],
     displayName: User['displayName'],
     chatId: Chat['telegramId'],
-  ) => Promise<void>
+  ) => Promise<{
+    alreadyExists: boolean
+  }>
 }
 
 export type SetNameInput = {
@@ -32,7 +34,10 @@ export const setNameUseCase =
       }
     }
 
-    await setUserName(userId, validated.data, chatId)
+    const { alreadyExists } = await setUserName(userId, validated.data, chatId)
+
+    if (alreadyExists)
+      return { message: `Пользователь с именем ${displayName} уже есть` }
 
     return {
       message: `Теперь я буду звать вас ${displayName}`,

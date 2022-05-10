@@ -15,7 +15,7 @@ import {
   deleteTagForUser,
   getAllUsersInChat,
   getUsersWithTags,
-  listTagsForUser,
+  listTags,
   setTagForUser,
 } from './tags.db'
 
@@ -43,7 +43,7 @@ export const createTagsContainer =
       prismaClient: asValue(prismaClient),
 
       setTagUseCase: asFunction(setTagUseCase),
-      listTagsForUser: asFunction(listTagsForUser),
+      listTags: asFunction(listTags),
       deleteTagForUser: asFunction(deleteTagForUser),
       getUsersWithTags: asFunction(getUsersWithTags),
       getAllUsersInChat: asFunction(getAllUsersInChat),

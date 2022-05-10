@@ -18,13 +18,23 @@
     "example": "/deltag amogus"
   },
   {
+    "command": "dryping",
+    "description": "Посмотреть пользователей с указанными тегами",
+    "example": "/dryping abobus amogus"
+  },
+  {
+    "command": "about",
+    "description": "Посмотреть инфу о пользователе",
+    "example": "/about abobus"
+  },
+  {
     "command": "setname",
     "description": "Переименоваться",
     "example": "/setname aboba"
   },
   {
     "command": "taglist",
-    "description": "Посмотреть все свои теги"
+    "description": "Посмотреть все теги на сервере"
   },
   {
     "command": "roll",
