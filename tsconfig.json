@@ -4,6 +4,7 @@
     "strict": true,
     "baseUrl": ".",
     "downlevelIteration": true,
+    "target": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "types": ["vite/client"],
