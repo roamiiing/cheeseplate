@@ -5,7 +5,6 @@ import { UseCaseContext, Entity, EntityType } from '@/libs/shared/workflow'
 const mapEntity =
   (ctx: Context) =>
   (v: MessageEntity): Entity => {
-    console.log(v)
     switch (v.type) {
       case 'mention': {
         const username = deunionize(ctx.message)!.text?.substring(

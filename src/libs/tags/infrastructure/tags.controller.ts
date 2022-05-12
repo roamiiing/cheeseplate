@@ -1,6 +1,6 @@
 import { wrapUseCase } from '@/libs/shared/telegraf'
 import { PrismaClient } from '@prisma/client'
-import { Telegraf } from 'telegraf'
+import { deunionize, Telegraf } from 'telegraf'
 import {
   SET_TAG_COMMAND,
   LIST_TAGS_COMMAND,
@@ -47,8 +47,12 @@ export const configureTags =
       await wrapUseCase(ctx, tagsContainer.cradle.listTagsUseCase)
     })
 
-    bot.on('text', async ctx => {
-      const tags = [...ctx.message.text.matchAll(TAG_REGEX)]
+    bot.use(async ctx => {
+      const tags = [
+        ...(deunionize(ctx.message)?.text?.matchAll(TAG_REGEX) ?? []),
+        // also match picture/video/repost captions
+        ...(deunionize(ctx.message)?.caption?.matchAll(TAG_REGEX) ?? []),
+      ]
         .map(([str]) => str)
         .map(str => str.replace(TAG_SYMBOL, ''))
 
