@@ -32,7 +32,39 @@ model User {
   chatTelegramId   BigInt
   chat             Chat    @relation(fields: [chatTelegramId], references: [telegramId])
 
+  countersId Int
+  counters   Counters?
+
+  achievements Achievements[]
+              
   @@unique([telegramUsername, chatTelegramId])
   @@unique([telegramId, chatTelegramId])
   @@unique([displayName, chatTelegramId])
+}
+
+model Counters {
+  id Int @id @default(autoincrement())
+
+  telegramUserId BigInt
+  telegramChatId BigInt
+
+  user User @relation(fields: [telegramChatId, telegramUserId], references: [chatTelegramId, telegramId])
+
+  isItHypeCounter Int @default(0)
+}
+
+enum Achievement {
+  IsItHype
+  SensorsAreShit
+}
+
+model Achievements {
+  id Int @id @default(autoincrement())
+
+  telegramUserId BigInt
+  telegramChatId BigInt
+
+  user User @relation(fields: [telegramChatId, telegramUserId], references: [chatTelegramId, telegramId])
+
+  achievements Achievement[]
 }

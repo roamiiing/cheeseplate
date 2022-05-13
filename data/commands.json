@@ -35,5 +35,10 @@
   {
     "command": "ben",
     "description": "Hohoho. No."
+  },
+  {
+    "command": "pick",
+    "description": "Выбрать один из предложенных вариантов. Разделяйте варианты либо запятыми, либо указывайте каждый новый вариант на новой строке",
+    "example": "/pick amogus, aboba"
   }
 ]

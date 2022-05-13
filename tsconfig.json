@@ -14,5 +14,9 @@
     },
     "outDir": "dist"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "data/**/*.json"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "data/**/*.json"],
+  "ts-node": {
+    "typeCheck": false,
+    "transpileOnly": true
+  }
 }
