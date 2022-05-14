@@ -32,7 +32,7 @@ model User {
   chatTelegramId   BigInt
   chat             Chat    @relation(fields: [chatTelegramId], references: [telegramId])
 
-  countersId Int
+  countersId Int?
   counters   Counters?
 
   achievements Achievements[]
