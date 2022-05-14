@@ -1,2 +1,2 @@
 export * from './escape-html'
-export * from './strip-command'
+export * from './strip-first'
