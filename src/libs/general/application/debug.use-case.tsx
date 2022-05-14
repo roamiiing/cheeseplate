@@ -23,7 +23,9 @@ export const debugUseCase =
     const { ram, uptime } = serverInfo
 
     const mappedServerInfo = {
-      ram: `${ram.process.toString('MB')}/${ram.total.toString('MB')}`,
+      ram: `${Math.floor(ram.process.in('MB'))}/${Math.floor(
+        ram.total.in('MB'),
+      )} MB`,
       uptime: uptime.toString('h'),
     }
 

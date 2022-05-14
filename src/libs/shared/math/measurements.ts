@@ -3,9 +3,9 @@ import { measurement, unit } from 'metriqa'
 export const information = measurement(
   unit('b'),
   unit('B', 8),
-  unit('KB', 1024),
-  unit('MB', 1024),
-  unit('GB', 1024),
+  unit('KB', 1000),
+  unit('MB', 1000),
+  unit('GB', 1000),
 )
 export type Information = ReturnType<typeof information>
 

@@ -37,10 +37,10 @@ export const configureGeneral =
 
             const serverInfo = {
               ram: {
-                process: information(process.memoryUsage().heapTotal, 'B'),
+                process: information(process.memoryUsage().rss, 'B'),
                 total: information(os.totalmem(), 'B'),
               },
-              uptime: time(process.uptime(), 'ms'),
+              uptime: time(Math.floor(process.uptime()), 's'),
             }
 
             await wrapUseCase(ctx, generalContainer.cradle.debugUseCase, {

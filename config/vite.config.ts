@@ -22,13 +22,14 @@ export default defineConfig({
       external: [
         ...Object.keys(pkg.dependencies),
         'path',
+        'os',
         /^@prisma\/client/,
         /^react-dom/,
       ],
     },
     minify: 'terser',
     // TODO: upload source maps to sentry
-    sourcemap: true,
+    sourcemap: 'inline',
   },
   test: {
     environment: 'node',

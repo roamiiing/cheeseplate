@@ -2,6 +2,8 @@ import { config } from 'dotenv'
 
 config()
 
+require('source-map-support').install()
+
 import { appContainer } from './container'
 
 appContainer.cradle.configureChats()
