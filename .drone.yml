@@ -1,0 +1,15 @@
+kind: pipeline
+
+# Исключает сработку на тэги
+trigger:
+  branch:
+    - master
+
+steps:
+  - name: npm-install
+    image: node:16.14
+    pull: if-not-exists
+    depends_on: [clone]
+    network_mode: host
+    commands:
+      - npm ci
