@@ -9,9 +9,11 @@ export type PingDeps = {
   getUsersWithTags: (
     tags: Tag['tag'][],
     chatId: Chat['telegramId'],
+    currentUserId?: User['id'],
   ) => Promise<Pick<User, 'telegramId' | 'displayName'>[]>
   getAllUsersInChat: (
     chatId: Chat['telegramId'],
+    currentUserId?: User['id'],
   ) => Promise<Pick<User, 'telegramId' | 'displayName'>[]>
 }
 
@@ -47,10 +49,14 @@ const pingReplica = useRandomReplica({
 
 export const pingUseCase =
   ({ getUsersWithTags, getAllUsersInChat }: PingDeps): UseCase<PingInput> =>
-  async ({ chatInfo: { chatId }, input: { tags, dry = false } }) => {
+  async ({
+    chatInfo: { chatId },
+    userInfo: { userId },
+    input: { tags, dry = false },
+  }) => {
     const users = await (tags.includes(ALL_TAG)
-      ? getAllUsersInChat(chatId)
-      : getUsersWithTags(tags, chatId))
+      ? getAllUsersInChat(chatId, !dry ? Number(userId) : undefined)
+      : getUsersWithTags(tags, chatId, !dry ? Number(userId) : undefined))
 
     if (!dry) {
       if (users.length === 0) return

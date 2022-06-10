@@ -5,6 +5,7 @@ import {
   PingDeps,
   SetTagDeps,
 } from '@/libs/tags/application'
+import { compareDespiteCasing } from '@/libs/shared/strings'
 
 export type CrudDeps = {
   prismaClient: PrismaClient
@@ -29,7 +30,9 @@ export const setTagForUser =
           },
         },
       })
-      .then(user => user?.tags.map(v => v.tag).includes(tag))
+      .then(user =>
+        user?.tags.map(v => v.tag).find(v => compareDespiteCasing(tag, v)),
+      )
 
     if (alreadyHas) {
       return {
@@ -55,7 +58,7 @@ export const setTagForUser =
         },
       },
       create: {
-        tag,
+        tag: tag.toLowerCase(),
         users: {
           connect: [
             {
@@ -79,60 +82,48 @@ export const setTagForUser =
 
 export const getAllUsersInChat =
   ({ prismaClient }: CrudDeps): PingDeps['getAllUsersInChat'] =>
-  async chatId => {
-    const existing = await prismaClient.tag.findMany({
+  (chatId, currentUserId) =>
+    prismaClient.user.findMany({
       select: {
-        users: {
-          select: {
-            telegramId: true,
-            displayName: true,
+        telegramId: true,
+        displayName: true,
+      },
+      where: {
+        AND: {
+          chatTelegramId: chatId,
+          NOT: {
+            telegramId: currentUserId,
           },
         },
       },
-      where: {
-        chatTelegramId: chatId,
-      },
     })
-
-    if (!existing) return []
-
-    return existing
-      .map(v => v.users)
-      .flat()
-      .filter(
-        (v, i, a) => a.findIndex(vv => vv.telegramId === v.telegramId) === i,
-      )
-  }
 
 export const getUsersWithTags =
   ({ prismaClient }: CrudDeps): PingDeps['getUsersWithTags'] =>
-  async (tags, chatId) => {
-    const existing = await prismaClient.tag.findMany({
+  (tags, chatId, currentUserId) =>
+    prismaClient.user.findMany({
       select: {
-        users: {
-          select: {
-            telegramId: true,
-            displayName: true,
+        telegramId: true,
+        displayName: true,
+      },
+      where: {
+        tags: {
+          some: {
+            chatTelegramId: chatId,
+            tag: {
+              in: tags,
+              mode: 'insensitive',
+            },
+          },
+        },
+        AND: {
+          chatTelegramId: chatId,
+          NOT: {
+            telegramId: currentUserId,
           },
         },
       },
-      where: {
-        tag: {
-          in: tags,
-        },
-        chatTelegramId: chatId,
-      },
     })
-
-    if (!existing) return []
-
-    return existing
-      .map(v => v.users)
-      .flat()
-      .filter(
-        (v, i, a) => a.findIndex(vv => vv.telegramId === v.telegramId) === i,
-      )
-  }
 
 export const deleteTagForUser =
   ({ prismaClient }: CrudDeps): DeleteTagDeps['deleteTagForUser'] =>
@@ -147,7 +138,7 @@ export const deleteTagForUser =
       },
     })
 
-    if (!user?.tags.find(v => v.tag === tag)) {
+    if (!user?.tags.find(v => compareDespiteCasing(v.tag, tag))) {
       return {
         deleted: false,
       }
@@ -163,7 +154,7 @@ export const deleteTagForUser =
       data: {
         tags: {
           set: user.tags
-            .filter(v => v.tag !== tag)
+            .filter(v => !compareDespiteCasing(v.tag, tag))
             .map(v => ({
               tag_chatTelegramId: {
                 tag: v.tag,
@@ -183,10 +174,14 @@ export const listTags =
   ({ prismaClient }: CrudDeps): ListTagsDeps['listTags'] =>
   async chatId => {
     const result = await prismaClient.tag.findMany({
+      select: {
+        users: true,
+        tag: true,
+      },
       where: {
         chatTelegramId: chatId,
       },
     })
 
-    return result.map(v => v.tag)
+    return result.filter(v => v.users.length > 0).map(v => v.tag)
   }
