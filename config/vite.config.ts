@@ -5,7 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 import pkg from '../package.json'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     tsconfigPaths({
       root: path.resolve(__dirname, '..'),
@@ -31,7 +31,10 @@ export default defineConfig({
     // TODO: upload source maps to sentry
     sourcemap: 'inline',
   },
+  define: {
+    __PROD__: command === 'build',
+  },
   test: {
     environment: 'node',
   },
-})
+}))

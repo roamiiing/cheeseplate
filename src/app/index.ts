@@ -5,6 +5,11 @@ config()
 require('source-map-support').install()
 
 import { appContainer } from './container'
+import { captureError, initSentry } from './misc'
+
+if (__PROD__) {
+  initSentry()
+}
 
 appContainer.cradle.configureChats()
 appContainer.cradle.configureGeneral()
@@ -15,6 +20,10 @@ appContainer.cradle.configureTags()
 appContainer.cradle.botBuilder.run()
 
 appContainer.cradle.bot.catch((err, ctx) => {
+  if (__PROD__) {
+    captureError(err, ctx)
+  }
+
   console.error(err, ctx)
 })
 

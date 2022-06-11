@@ -1,8 +1,7 @@
 {
-  "name": "granat-api",
+  "name": "cheeseplate",
   "version": "1.0.0",
   "description": "",
-  "main": "/api/index.js",
   "scripts": {
     "test": "vitest --config config/vite.config.ts",
     "lint": "eslint .",
