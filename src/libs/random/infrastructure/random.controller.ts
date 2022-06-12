@@ -1,54 +1,34 @@
-import { Telegraf } from 'telegraf'
-import { pipe } from 'fp-ts/function'
-
-import { wrapUseCase } from '@/libs/shared/telegraf'
-import { stripFirst } from '@/libs/shared/strings'
 import { PriorityBuilder } from '@/libs/shared/workflow'
 import {
   BEN_COMMAND,
   PICK_COMMAND,
   ROLL_COMMAND,
 } from '@/libs/random/application'
+import { CheeseBot } from '@/libs/shared/bot'
 
 import { createTagsContainer } from './random.container'
 
 export type RandomControllerDeps = {
-  bot: Telegraf
+  cheeseBot: CheeseBot
   botBuilder: PriorityBuilder
 }
 
 export const configureRandom =
-  ({ bot, botBuilder }: RandomControllerDeps) =>
+  ({ cheeseBot, botBuilder }: RandomControllerDeps) =>
   () => {
     const randomContainer = createTagsContainer()
 
-    botBuilder
-      .add(() => {
-        bot.command(ROLL_COMMAND, async ctx => {
-          const message = stripFirst(ctx.message.text)
-
-          await wrapUseCase(ctx, randomContainer.cradle.rollUseCase, {
-            message,
-          })
-        })
-      })
-      .add(() =>
-        bot.command(BEN_COMMAND, async ctx => {
-          await wrapUseCase(ctx, randomContainer.cradle.benUseCase)
-        }),
-      )
-      .add(() =>
-        bot.command(PICK_COMMAND, async ctx => {
-          const choices = pipe(ctx.message.text, stripFirst, raw =>
-            raw
-              .split(/\n/.test(raw) ? '\n' : ',')
-              .map(v => v.trim())
-              .filter(v => !!v),
-          )
-
-          await wrapUseCase(ctx, randomContainer.cradle.pickUseCase, {
-            choices,
-          })
-        }),
-      )
+    botBuilder.add(() => {
+      cheeseBot
+        .useCommand(ROLL_COMMAND, randomContainer.cradle.rollUseCase, ctx => ({
+          message: ctx.strippedMessage,
+        }))
+        .useCommand(BEN_COMMAND, randomContainer.cradle.benUseCase)
+        .useCommand(PICK_COMMAND, randomContainer.cradle.pickUseCase, ctx => ({
+          choices: ctx.strippedMessage
+            .split(/\n/.test(ctx.strippedMessage) ? '\n' : ',')
+            .map(v => v.trim())
+            .filter(v => !!v),
+        }))
+    })
   }

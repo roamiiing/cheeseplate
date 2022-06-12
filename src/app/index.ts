@@ -7,7 +7,7 @@ require('source-map-support').install()
 import { appContainer } from './container'
 import { captureError, initSentry } from './misc'
 
-if (__PROD__) {
+if (process.env.NODE_ENV === 'production') {
   initSentry()
 }
 
@@ -20,7 +20,7 @@ appContainer.cradle.configureTags()
 appContainer.cradle.botBuilder.run()
 
 appContainer.cradle.bot.catch((err, ctx) => {
-  if (__PROD__) {
+  if (process.env.NODE_ENV === 'production') {
     captureError(err, ctx)
   }
 
