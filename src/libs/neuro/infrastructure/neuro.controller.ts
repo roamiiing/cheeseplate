@@ -20,7 +20,7 @@ export const configureNeuro =
         container.cradle.dalleUseCase,
         ({ strippedMessage }) => ({ prompt: strippedMessage }),
         {
-          maxInProgress: 1,
+          maxInProgress: 3,
         },
       ),
     )
