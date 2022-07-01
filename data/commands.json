@@ -40,5 +40,10 @@
     "command": "pick",
     "description": "Выбрать один из предложенных вариантов. Разделяйте варианты либо запятыми, либо указывайте каждый новый вариант на новой строке",
     "example": "/pick amogus, aboba"
+  },
+  {
+    "command": "dalle",
+    "description": "Сгенерировать изображения по тексту",
+    "example": "/dalle billie eilish but it's amongus"
   }
 ]

@@ -1,4 +1,4 @@
-import { UseCase } from '@/libs/shared/workflow'
+import { GeneratorUseCase, UseCase } from '@/libs/shared/workflow'
 
 export type InputMapper<Input> = (context: {
   /**
@@ -14,10 +14,22 @@ export type InputMapper<Input> = (context: {
   strippedMessage: string
 }) => Input
 
+export type Options = {
+  maxInProgress?: number
+}
+
 export interface CheeseBot {
   useCommand<Input>(
     command: string,
     useCase: UseCase<Input>,
     inputMapper?: InputMapper<Input>,
+    options?: Options,
+  ): CheeseBot
+
+  useGeneratorCommand<Input>(
+    command: string,
+    useCase: GeneratorUseCase<Input>,
+    inputMapper?: InputMapper<Input>,
+    options?: Options,
   ): CheeseBot
 }

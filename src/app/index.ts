@@ -16,6 +16,7 @@ appContainer.cradle.configureGeneral()
 appContainer.cradle.configureUsers()
 appContainer.cradle.configureRandom()
 appContainer.cradle.configureTags()
+appContainer.cradle.configureNeuro()
 
 appContainer.cradle.botBuilder.run()
 

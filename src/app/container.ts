@@ -9,6 +9,7 @@ import { configureTags } from '@/libs/tags/infrastructure'
 import { configureRandom } from '@/libs/random/infrastructure'
 import { configureGeneral } from '@/libs/general/infrastructure'
 import { configureChats } from '@/libs/chats/infrastructure'
+import { configureNeuro } from '@/libs/neuro/infrastructure'
 
 import { bot, prismaClient, botBuilder, cheeseBot } from './clients'
 
@@ -23,6 +24,7 @@ export const appContainer = createContainer<{
   configureUsers: ReturnType<typeof configureUsers>
   configureTags: ReturnType<typeof configureTags>
   configureRandom: ReturnType<typeof configureRandom>
+  configureNeuro: ReturnType<typeof configureNeuro>
 }>({
   injectionMode: InjectionMode.PROXY,
 }).register({
@@ -36,4 +38,5 @@ export const appContainer = createContainer<{
   configureUsers: asFunction(configureUsers),
   configureTags: asFunction(configureTags),
   configureRandom: asFunction(configureRandom),
+  configureNeuro: asFunction(configureNeuro),
 })

@@ -52,6 +52,7 @@
     "@sentry/tracing": "^6.18.1",
     "argon2": "^0.28.4",
     "awilix": "^6.1.0",
+    "axios": "^0.27.2",
     "fastify": "^3.25.3",
     "fastify-swagger": "^4.15.0",
     "fp-ts": "^2.11.8",

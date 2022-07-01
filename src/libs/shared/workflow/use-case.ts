@@ -1,4 +1,5 @@
 import { UseCaseContext } from './context'
+import { Media } from './media'
 
 export type UseCaseResult =
   | {
@@ -6,6 +7,9 @@ export type UseCaseResult =
     }
   | {
       gif: string
+    }
+  | {
+      media: Media[]
     }
 
 export type UseCase<Input> = (
