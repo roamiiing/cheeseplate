@@ -1,4 +1,4 @@
-# circles-essentials-bot
+# cheeseplate
 
 Это бот с жизненно-необходимыми командами для телеги.
 
