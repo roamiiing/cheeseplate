@@ -1,7 +1,11 @@
 import { UseCaseContext } from './context'
 import { Media } from './media'
 
-export type UseCaseResult =
+export type UseCaseResultOptions = {
+  notify?: boolean
+}
+
+export type UseCaseResult = (
   | {
       message: string
     }
@@ -11,6 +15,9 @@ export type UseCaseResult =
   | {
       media: Media[]
     }
+) & {
+  options?: UseCaseResultOptions
+}
 
 export type UseCase<Input> = (
   ctx: UseCaseContext<Input>,

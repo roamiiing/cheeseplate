@@ -70,6 +70,9 @@ export const pingUseCase =
             )
             .join(', '),
         }),
+        options: {
+          notify: true,
+        },
       }
     }
 

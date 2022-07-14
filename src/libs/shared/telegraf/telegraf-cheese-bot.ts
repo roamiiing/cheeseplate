@@ -1,4 +1,5 @@
 import { Telegraf } from 'telegraf'
+import { captureException } from '@sentry/node'
 
 import { CheeseBot, InputMapper, Options } from '@/libs/shared/bot'
 import { stripFirst } from '@/libs/shared/strings'
@@ -47,21 +48,27 @@ export class TelegrafCheeseBot implements CheeseBot {
           inProgress++
           const message = ctx.message.text
 
-          await wrapGeneratorUseCase(
-            ctx,
-            useCase,
-            inputMapper({
-              rawMessage: message,
-              strippedMessage: stripFirst(message),
-            }),
-          )
-
-          inProgress--
+          try {
+            await wrapGeneratorUseCase(
+              ctx,
+              useCase,
+              inputMapper({
+                rawMessage: message,
+                strippedMessage: stripFirst(message),
+              }),
+            )
+          } catch (e) {
+            console.error('Error with telegram answering', e)
+            captureException(e)
+          } finally {
+            inProgress--
+          }
         } else {
           ctx.replyWithHTML(
             `Прости, но не в этот раз :(\nЭта команда очень ресурсозатратная и сейчас очередь переполнена! Приходи позже 👻`,
             {
               reply_to_message_id: ctx.message.message_id,
+              disable_notification: true,
             },
           )
         }

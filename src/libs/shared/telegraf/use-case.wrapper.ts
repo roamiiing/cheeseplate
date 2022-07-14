@@ -21,6 +21,8 @@ export const processResult = async (
   result: UseCaseResult | undefined | null | never | void,
   ctx: Context,
 ) => {
+  const { notify = false } = result?.options ?? {}
+
   if (result) {
     if ('media' in result) {
       const media = result.media
@@ -36,15 +38,18 @@ export const processResult = async (
         {
           reply_to_message_id: ctx.message?.message_id,
           allow_sending_without_reply: true,
+          disable_notification: !notify,
         },
       )
     } else if ('message' in result)
       await ctx.replyWithHTML(result.message, {
         reply_to_message_id: ctx.message!.message_id,
+        disable_notification: !notify,
       })
     else if ('gif' in result)
       await ctx.replyWithAnimation(result.gif, {
         reply_to_message_id: ctx.message!.message_id,
+        disable_notification: !notify,
       })
   }
 }
