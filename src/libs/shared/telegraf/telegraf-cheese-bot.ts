@@ -4,24 +4,31 @@ import { captureException } from '@sentry/node'
 import { CheeseBot, InputMapper, Options } from '@/libs/shared/bot'
 import { stripFirst } from '@/libs/shared/strings'
 import { GeneratorUseCase, UseCase } from '@/libs/shared/workflow'
+import { Queue } from '@/libs/shared/queue'
 
-import { wrapUseCase } from './use-case.wrapper'
+import { processResult, wrapUseCase } from './use-case.wrapper'
 import { wrapGeneratorUseCase } from './generator-use-case.wrapper'
 
+export type TelegrafCheeseBotDeps = {
+  bot: Telegraf
+  queue: Queue
+}
+
 export class TelegrafCheeseBot implements CheeseBot {
-  constructor(private readonly telegrafBot: Telegraf) {}
+  constructor(private readonly deps: TelegrafCheeseBotDeps) {}
 
   useCommand<Input>(
     command: string,
     useCase: UseCase<Input>,
     inputMapper: InputMapper<Input> = () => undefined as any,
   ) {
-    this.telegrafBot.command(command, async ctx => {
+    this.deps.bot.command(command, async ctx => {
       const message = ctx.message.text
 
       await wrapUseCase(
         ctx,
         useCase,
+        this.deps.queue,
         inputMapper({
           rawMessage: message,
           strippedMessage: stripFirst(message),
@@ -42,7 +49,7 @@ export class TelegrafCheeseBot implements CheeseBot {
 
     let inProgress = 0
 
-    this.telegrafBot.command(command, ctx => {
+    this.deps.bot.command(command, ctx => {
       ;(async () => {
         if (inProgress < maxInProgress) {
           inProgress++
@@ -52,6 +59,7 @@ export class TelegrafCheeseBot implements CheeseBot {
             await wrapGeneratorUseCase(
               ctx,
               useCase,
+              this.deps.queue,
               inputMapper({
                 rawMessage: message,
                 strippedMessage: stripFirst(message),
@@ -64,12 +72,13 @@ export class TelegrafCheeseBot implements CheeseBot {
             inProgress--
           }
         } else {
-          ctx.replyWithHTML(
-            `Прости, но не в этот раз :(\nЭта команда очень ресурсозатратная и сейчас очередь переполнена! Приходи позже 👻`,
+          processResult(
             {
-              reply_to_message_id: ctx.message.message_id,
-              disable_notification: true,
+              message:
+                'Прости, но не в этот раз :(\nЭта команда очень ресурсозатратная и сейчас очередь переполнена! Приходи позже 👻',
             },
+            ctx,
+            this.deps.queue,
           )
         }
       })()

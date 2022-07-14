@@ -1,5 +1,11 @@
 import { PrismaClient } from '@prisma/client'
-import { asFunction, asValue, createContainer, InjectionMode } from 'awilix'
+import {
+  asFunction,
+  asValue,
+  asClass,
+  createContainer,
+  InjectionMode,
+} from 'awilix'
 import { Telegraf } from 'telegraf'
 
 import { PriorityBuilder } from '@/libs/shared/workflow'
@@ -11,13 +17,17 @@ import { configureGeneral } from '@/libs/general/infrastructure'
 import { configureChats } from '@/libs/chats/infrastructure'
 import { configureNeuro } from '@/libs/neuro/infrastructure'
 
-import { bot, prismaClient, botBuilder, cheeseBot } from './clients'
+import { TelegrafCheeseBot } from '@/libs/shared/telegraf'
+import { Queue } from '@/libs/shared/queue'
+
+import { bot, prismaClient, botBuilder } from './clients'
 
 export const appContainer = createContainer<{
   bot: Telegraf
   botBuilder: PriorityBuilder
   prismaClient: PrismaClient
   cheeseBot: CheeseBot
+  queue: Queue
 
   configureChats: ReturnType<typeof configureChats>
   configureGeneral: ReturnType<typeof configureGeneral>
@@ -31,7 +41,9 @@ export const appContainer = createContainer<{
   bot: asValue(bot),
   botBuilder: asValue(botBuilder),
   prismaClient: asValue(prismaClient),
-  cheeseBot: asValue(cheeseBot),
+  queue: asValue(new Queue()),
+
+  cheeseBot: asClass(TelegrafCheeseBot),
 
   configureChats: asFunction(configureChats),
   configureGeneral: asFunction(configureGeneral),

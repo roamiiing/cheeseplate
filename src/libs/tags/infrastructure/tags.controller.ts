@@ -10,6 +10,8 @@ import {
 } from '@/libs/tags/application'
 import { TAG_REGEX, TAG_SYMBOL } from '@/libs/tags/domain'
 import { PriorityBuilder } from '@/libs/shared/workflow'
+import { CheeseBot } from '@/libs/shared/bot'
+import { Queue } from '@/libs/shared/queue'
 
 import { createTagsContainer } from './tags.container'
 
@@ -17,10 +19,12 @@ export type UsersControllerDeps = {
   bot: Telegraf
   prismaClient: PrismaClient
   botBuilder: PriorityBuilder
+  queue: Queue
+  cheeseBot: CheeseBot
 }
 
 export const configureTags =
-  ({ bot, prismaClient, botBuilder }: UsersControllerDeps) =>
+  ({ bot, prismaClient, botBuilder, cheeseBot, queue }: UsersControllerDeps) =>
   () => {
     const tagsContainer = createTagsContainer({
       prismaClient,
@@ -28,33 +32,31 @@ export const configureTags =
 
     botBuilder
       .add(() =>
-        bot.command(SET_TAG_COMMAND, async ctx => {
-          const [, tag] = ctx.message.text.split(/\s+/)
-
-          await wrapUseCase(ctx, tagsContainer.cradle.setTagUseCase, { tag })
-        }),
+        cheeseBot.useCommand(
+          SET_TAG_COMMAND,
+          tagsContainer.cradle.setTagUseCase,
+          ({ strippedMessage }) => ({ tag: strippedMessage.split(/\s+/)[0] }),
+        ),
       )
       .add(() =>
-        bot.command(DELETE_TAG_COMMAND, async ctx => {
-          const [, tag] = ctx.message.text.split(/\s+/)
-
-          await wrapUseCase(ctx, tagsContainer.cradle.deleteTagUseCase, { tag })
-        }),
+        cheeseBot.useCommand(
+          DELETE_TAG_COMMAND,
+          tagsContainer.cradle.deleteTagUseCase,
+          ({ strippedMessage }) => ({ tag: strippedMessage.split(/\s+/)[0] }),
+        ),
       )
       .add(() =>
-        bot.command(DRY_PING_COMMAND, async ctx => {
-          const [, ...tags] = ctx.message.text.split(/\s+/)
-
-          await wrapUseCase(ctx, tagsContainer.cradle.pingUseCase, {
-            tags,
-            dry: true,
-          })
-        }),
+        cheeseBot.useCommand(
+          DRY_PING_COMMAND,
+          tagsContainer.cradle.pingUseCase,
+          ({ strippedMessage }) => ({ tags: strippedMessage.split(/\s+/) }),
+        ),
       )
       .add(() =>
-        bot.command(LIST_TAGS_COMMAND, async ctx => {
-          await wrapUseCase(ctx, tagsContainer.cradle.listTagsUseCase)
-        }),
+        cheeseBot.useCommand(
+          LIST_TAGS_COMMAND,
+          tagsContainer.cradle.listTagsUseCase,
+        ),
       )
       .add(
         () =>
@@ -67,7 +69,10 @@ export const configureTags =
               .map(([str]) => str)
               .map(str => str.replace(TAG_SYMBOL, ''))
 
-            await wrapUseCase(ctx, tagsContainer.cradle.pingUseCase, { tags })
+            // TODO: move to cheeseBot
+            await wrapUseCase(ctx, tagsContainer.cradle.pingUseCase, queue, {
+              tags,
+            })
           }),
         {
           priority: -10,

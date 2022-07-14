@@ -8,14 +8,16 @@ import { HELP_COMMAND, DEBUG_COMMAND } from '@/libs/general/application'
 import { createGeneralContainer } from './general.container'
 import { PrismaClient } from '@prisma/client'
 import { information, time } from '@/libs/shared/math'
+import { Queue } from '@/libs/shared/queue'
 
 export type GeneralControllerDeps = {
   bot: Telegraf
   botBuilder: PriorityBuilder
+  queue: Queue
 }
 
 export const configureGeneral =
-  ({ bot, botBuilder }: GeneralControllerDeps) =>
+  ({ bot, botBuilder, queue }: GeneralControllerDeps) =>
   () => {
     const generalContainer = createGeneralContainer()
 
@@ -24,7 +26,7 @@ export const configureGeneral =
         bot.command(
           HELP_COMMAND,
           async ctx =>
-            await wrapUseCase(ctx, generalContainer.cradle.helpUseCase),
+            await wrapUseCase(ctx, generalContainer.cradle.helpUseCase, queue),
         ),
       )
       .add(
@@ -43,10 +45,15 @@ export const configureGeneral =
               uptime: time(Math.floor(process.uptime()), 's'),
             }
 
-            await wrapUseCase(ctx, generalContainer.cradle.debugUseCase, {
-              chatInfo,
-              serverInfo,
-            })
+            await wrapUseCase(
+              ctx,
+              generalContainer.cradle.debugUseCase,
+              queue,
+              {
+                chatInfo,
+                serverInfo,
+              },
+            )
           }),
         {
           priority: 11,

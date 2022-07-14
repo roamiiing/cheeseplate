@@ -4,6 +4,7 @@ import { Telegraf } from 'telegraf'
 import { SET_NAME_COMMAND, ABOUT_COMMAND } from '@/libs/users/application'
 import { wrapUseCase } from '@/libs/shared/telegraf'
 import { PriorityBuilder } from '@/libs/shared/workflow'
+import { CheeseBot } from '@/libs/shared/bot'
 
 import { createUsersContainer } from './users.container'
 
@@ -11,10 +12,11 @@ export type UsersControllerDeps = {
   bot: Telegraf
   botBuilder: PriorityBuilder
   prismaClient: PrismaClient
+  cheeseBot: CheeseBot
 }
 
 export const configureUsers =
-  ({ bot, prismaClient, botBuilder }: UsersControllerDeps) =>
+  ({ bot, prismaClient, botBuilder, cheeseBot }: UsersControllerDeps) =>
   () => {
     const usersContainer = createUsersContainer({
       prismaClient,
@@ -23,23 +25,22 @@ export const configureUsers =
 
     botBuilder
       .add(() =>
-        bot.command(ABOUT_COMMAND, async ctx => {
-          // TODO: получать при помощи entity
-          const [, displayName] = ctx.message.text.split(/\s+/)
-
-          await wrapUseCase(ctx, usersContainer.cradle.aboutUseCase, {
-            displayName,
-          })
-        }),
+        cheeseBot.useCommand(
+          ABOUT_COMMAND,
+          usersContainer.cradle.aboutUseCase,
+          ({ strippedMessage }) => ({
+            displayName: strippedMessage.split(/\s+/)[0],
+          }),
+        ),
       )
       .add(() =>
-        bot.command(SET_NAME_COMMAND, async ctx => {
-          const [, displayName] = ctx.message.text.split(/\s+/)
-
-          await wrapUseCase(ctx, usersContainer.cradle.setNameUseCase, {
-            displayName,
-          })
-        }),
+        cheeseBot.useCommand(
+          SET_NAME_COMMAND,
+          usersContainer.cradle.setNameUseCase,
+          ({ strippedMessage }) => ({
+            displayName: strippedMessage.split(/\s+/)[0],
+          }),
+        ),
       )
       .add(
         () =>
