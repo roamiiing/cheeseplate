@@ -40,8 +40,8 @@ export class Queue {
   private static WINDOW = time(1, 'm')
 
   private readonly options: QueueOptions = {
-    overallRpm: 20,
-    specialRpm: 10,
+    overallRpm: 30,
+    specialRpm: 30,
     overallRps: 30,
     specialRps: 1,
   }
