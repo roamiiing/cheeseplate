@@ -146,7 +146,12 @@ export class Queue {
               .catch(e => {
                 if (e instanceof QueueError) {
                   this.retryTime = new Date(
-                    Date.now() + e.retryAfter.in('ms') + time(1, 's').in('ms'),
+                    Math.max(
+                      Date.now() +
+                        e.retryAfter.in('ms') +
+                        time(1, 's').in('ms'),
+                      this.retryTime.getTime(),
+                    ),
                   )
                 } else {
                   console.error('Could not send message:', e)

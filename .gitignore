@@ -7,5 +7,6 @@ dependencygraph.png
 .vercel
 docker/localvolumes
 .env
+env
 
 dist

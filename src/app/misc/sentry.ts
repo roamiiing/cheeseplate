@@ -1,8 +1,10 @@
 import * as Sentry from '@sentry/node'
 
+const { SENTRY_DSN = '' } = process.env
+
 export const initSentry = () => {
   Sentry.init({
-    dsn: process.env.SENTRY_DSN ?? '',
+    dsn: SENTRY_DSN,
     tracesSampleRate: 1.0,
     normalizeDepth: 12,
   })

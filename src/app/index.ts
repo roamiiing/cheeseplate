@@ -1,8 +1,4 @@
-import { config } from 'dotenv'
-
-config()
-
-require('source-map-support').install()
+import './config'
 
 import { appContainer } from './container'
 import { captureError, initSentry } from './misc'
@@ -11,12 +7,7 @@ if (process.env.NODE_ENV === 'production') {
   initSentry()
 }
 
-appContainer.cradle.configureChats()
-appContainer.cradle.configureGeneral()
-appContainer.cradle.configureUsers()
-appContainer.cradle.configureRandom()
-appContainer.cradle.configureTags()
-appContainer.cradle.configureNeuro()
+appContainer.cradle.configureModules()
 
 appContainer.cradle.botBuilder.run()
 

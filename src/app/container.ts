@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { pipe } from 'fp-ts/function'
 import {
   asFunction,
   asValue,
@@ -21,21 +22,58 @@ import { TelegrafCheeseBot } from '@/libs/shared/telegraf'
 import { Queue } from '@/libs/shared/queue'
 
 import { bot, prismaClient, botBuilder } from './clients'
+import { getModulesFromMask, Module } from './misc'
 
-export const appContainer = createContainer<{
-  bot: Telegraf
-  botBuilder: PriorityBuilder
-  prismaClient: PrismaClient
-  cheeseBot: CheeseBot
-  queue: Queue
-
+type ConfigureModulesDeps = {
   configureChats: ReturnType<typeof configureChats>
   configureGeneral: ReturnType<typeof configureGeneral>
   configureUsers: ReturnType<typeof configureUsers>
   configureTags: ReturnType<typeof configureTags>
   configureRandom: ReturnType<typeof configureRandom>
   configureNeuro: ReturnType<typeof configureNeuro>
-}>({
+}
+
+const {
+  // include all features by default
+  FEATURES_MASK = '63',
+} = process.env
+
+const configureModules =
+  ({
+    configureChats,
+    configureGeneral,
+    configureUsers,
+    configureTags,
+    configureRandom,
+    configureNeuro,
+  }: ConfigureModulesDeps) =>
+  () => {
+    // This one is always enabled for checking if chat is whitelisted
+    configureChats()
+
+    pipe(FEATURES_MASK, parseInt, getModulesFromMask, modules =>
+      modules.forEach(module =>
+        ({
+          [Module.General]: configureGeneral,
+          [Module.Users]: configureUsers,
+          [Module.Tags]: configureTags,
+          [Module.Random]: configureRandom,
+          [Module.Neuro]: configureNeuro,
+        }[module]()),
+      ),
+    )
+  }
+
+export const appContainer = createContainer<
+  {
+    bot: Telegraf
+    botBuilder: PriorityBuilder
+    prismaClient: PrismaClient
+    cheeseBot: CheeseBot
+    queue: Queue
+    configureModules: ReturnType<typeof configureModules>
+  } & ConfigureModulesDeps
+>({
   injectionMode: InjectionMode.PROXY,
 }).register({
   bot: asValue(bot),
@@ -51,4 +89,6 @@ export const appContainer = createContainer<{
   configureTags: asFunction(configureTags),
   configureRandom: asFunction(configureRandom),
   configureNeuro: asFunction(configureNeuro),
+
+  configureModules: asFunction(configureModules),
 })
