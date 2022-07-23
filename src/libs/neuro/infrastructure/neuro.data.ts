@@ -1,4 +1,10 @@
-import { DalleDeps, DALLE_TIMEOUT } from '@/libs/neuro/application'
+import {
+  DalleDeps,
+  DALLE_TIMEOUT,
+  RuGptDeps,
+  RUGPT_TIMEOUT,
+} from '@/libs/neuro/application'
+import { createFakeHeaders } from '@/libs/shared/http'
 import axios from 'axios'
 
 type DalleMiniResponse = {
@@ -28,6 +34,38 @@ export const requestDalleMiniImages =
       }))
     } catch (e) {
       console.error('Error with dalle:', e)
+      return null
+    }
+  }
+
+type RuGptResponse = {
+  predictions?: string
+}
+
+export const requestRuGptText =
+  (): RuGptDeps['requestRuGptText'] => async text => {
+    try {
+      const { data } = await axios.post<RuGptResponse>(
+        'https://api.aicloud.sbercloud.ru/public/v1/public_inference/gpt3/predict',
+        {
+          text,
+        },
+        {
+          timeout: RUGPT_TIMEOUT.in('ms'),
+          headers: createFakeHeaders({
+            host: 'api.aicloud.sbercloud.ru',
+            origin: 'https://russiannlp.github.io',
+          }),
+        },
+      )
+
+      if (!data.predictions || typeof data.predictions !== 'string') {
+        return null
+      }
+
+      return data.predictions
+    } catch (e) {
+      console.error('Error with rugpt:', e)
       return null
     }
   }

@@ -1,4 +1,8 @@
-import { dalleUseCase, DALLE_COMMAND } from '@/libs/neuro/application'
+import {
+  dalleUseCase,
+  DALLE_COMMAND,
+  RUGPT_COMMAND,
+} from '@/libs/neuro/application'
 import { PriorityBuilder } from '@/libs/shared/workflow'
 
 import { createNeuroContainer } from './neuro.container'
@@ -15,13 +19,22 @@ export const configureNeuro =
     const container = createNeuroContainer()
 
     botBuilder.add(() =>
-      cheeseBot.useGeneratorCommand(
-        DALLE_COMMAND,
-        container.cradle.dalleUseCase,
-        ({ strippedMessage }) => ({ prompt: strippedMessage }),
-        {
-          maxInProgress: 3,
-        },
-      ),
+      cheeseBot
+        .useGeneratorCommand(
+          DALLE_COMMAND,
+          container.cradle.dalleUseCase,
+          ({ strippedMessage }) => ({ prompt: strippedMessage }),
+          {
+            maxInProgress: 3,
+          },
+        )
+        .useGeneratorCommand(
+          RUGPT_COMMAND,
+          container.cradle.ruGptUseCase,
+          ({ strippedMessage }) => ({ prompt: strippedMessage }),
+          {
+            maxInProgress: 10,
+          },
+        ),
     )
   }
