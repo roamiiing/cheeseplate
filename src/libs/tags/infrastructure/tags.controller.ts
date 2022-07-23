@@ -49,7 +49,10 @@ export const configureTags =
         cheeseBot.useCommand(
           DRY_PING_COMMAND,
           tagsContainer.cradle.pingUseCase,
-          ({ strippedMessage }) => ({ tags: strippedMessage.split(/\s+/) }),
+          ({ strippedMessage }) => ({
+            tags: strippedMessage.split(/\s+/),
+            dry: true,
+          }),
         ),
       )
       .add(() =>
