@@ -11,8 +11,6 @@ export const createFakeHeaders = ({
   'Accept-Encoding': 'gzip, deflate, br',
   'Accept-Language': 'ru,en-US;q=0.9,en;q=0.8',
   Connection: 'keep-alive',
-  'Content-Length': 49,
-  'Content-Type': 'application/json',
   Host: host ?? '',
   Origin: origin,
   Referer: referer ?? origin,
