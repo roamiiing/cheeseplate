@@ -16,7 +16,8 @@ export const TagWithoutSymbol = z
   )
 
 export const ALL_TAG = 'all'
+export const HANGMAN_TAG = 'hangman'
 
-export const RESERVED_TAGS = [ALL_TAG]
+export const RESERVED_TAGS: readonly string[] = [ALL_TAG, HANGMAN_TAG]
 
 export const guardReservedTags = (tag: string) => !RESERVED_TAGS.includes(tag)
