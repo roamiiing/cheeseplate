@@ -3,6 +3,7 @@ import { mapZodError } from '@/libs/shared/validation'
 import { useRandomReplica } from '@/libs/shared/random'
 import { RuGptPrompt } from '@/libs/neuro/domain'
 import { Time } from '@/libs/shared/units'
+import { useReplica } from '@/libs/shared/strings'
 
 export const RUGPT_COMMAND = '/rugpt'
 export const RUGPT_TIMEOUT = Time(4, 'm')
@@ -27,7 +28,11 @@ const problemsReplica = useRandomReplica({
   replicas: [
     'Как и большинство русских 🇷🇺 технологий (и не только), ruGPT не очень любит работать. Приходи позже(',
   ],
-  placeholders: [],
+})
+
+const resultReplica = useReplica({
+  replica: '%result%',
+  placeholders: ['result'],
 })
 
 export const ruGptUseCase = ({
@@ -51,6 +56,6 @@ export const ruGptUseCase = ({
     }
 
     yield {
-      message: result,
+      message: resultReplica({ result }),
     }
   }

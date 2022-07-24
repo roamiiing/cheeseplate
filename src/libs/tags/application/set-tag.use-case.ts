@@ -3,6 +3,7 @@ import { User, Tag, Chat } from '@prisma/client'
 import { guardReservedTags, TagWithoutSymbol } from '@/libs/tags/domain'
 import { mapZodError } from '@/libs/shared/validation'
 import { useRandomReplica } from '@/libs/shared/random'
+import { useReplica } from '@/libs/shared/strings'
 
 export const SET_TAG_COMMAND = '/settag'
 
@@ -34,6 +35,15 @@ const successfulySetReplica = useRandomReplica({
   placeholders: ['tag'],
 })
 
+const reservedTagReplica = useReplica({
+  replica: 'Это зарезервированный тег',
+})
+
+const alreadyHasTagReplica = useReplica({
+  replica: 'У тебя уже есть тег %tag%',
+  placeholders: ['tag'],
+})
+
 export const setTagUseCase =
   ({ setTagForUser }: SetTagDeps): UseCase<SetTagInput> =>
   async ({ userInfo: { userId }, chatInfo: { chatId }, input: { tag } }) => {
@@ -48,7 +58,7 @@ export const setTagUseCase =
     }
 
     if (!guardReservedTags(validated.data)) {
-      return { message: 'Это зарезервированный тег' }
+      return { message: reservedTagReplica() }
     }
 
     const { newlyInserted } = await setTagForUser(
@@ -58,7 +68,7 @@ export const setTagUseCase =
     )
 
     if (!newlyInserted) {
-      return { message: `У тебя уже есть тег <b>${tag}</b>` }
+      return { message: alreadyHasTagReplica({ tag }) }
     }
 
     return {

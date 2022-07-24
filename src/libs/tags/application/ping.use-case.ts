@@ -2,6 +2,7 @@ import { UseCase } from '@/libs/shared/workflow'
 import { User, Tag, Chat } from '@prisma/client'
 import { ALL_TAG } from '@/libs/tags/domain'
 import { useRandomReplica } from '@/libs/shared/random'
+import { useReplica } from '@/libs/shared/strings'
 
 export const DRY_PING_COMMAND = '/dryping'
 
@@ -47,6 +48,10 @@ const pingReplica = useRandomReplica({
   placeholders: ['data'],
 })
 
+const noSuchUsersReplica = useReplica({
+  replica: 'Нет юзеров с такими тегами',
+})
+
 export const pingUseCase =
   ({ getUsersWithTags, getAllUsersInChat }: PingDeps): UseCase<PingInput> =>
   async ({
@@ -62,21 +67,26 @@ export const pingUseCase =
       if (users.length === 0) return
 
       return {
-        message: pingReplica({
-          data: users
-            .map(
-              ({ displayName, telegramId }) =>
-                `<a href="tg://user?id=${telegramId}">${displayName}</a>`,
-            )
-            .join(', '),
-        }),
+        message: pingReplica(
+          {
+            data: users
+              .map(
+                ({ displayName, telegramId }) =>
+                  `<a href="tg://user?id=${telegramId}">${displayName}</a>`,
+              )
+              .join(', '),
+          },
+          {
+            escape: false,
+          },
+        ),
         options: {
           notify: true,
         },
       }
     }
 
-    if (users.length === 0) return { message: 'Нет юзеров с такими тегами' }
+    if (users.length === 0) return { message: noSuchUsersReplica() }
 
     return {
       message: drypingReplica({

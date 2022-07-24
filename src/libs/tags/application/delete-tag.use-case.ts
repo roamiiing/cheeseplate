@@ -3,6 +3,7 @@ import { User, Tag, Chat } from '@prisma/client'
 import { guardReservedTags, TagWithoutSymbol } from '@/libs/tags/domain'
 import { mapZodError } from '@/libs/shared/validation'
 import { useRandomReplica } from '@/libs/shared/random'
+import { useReplica } from '@/libs/shared/strings'
 
 export const DELETE_TAG_COMMAND = '/deltag'
 
@@ -33,6 +34,11 @@ const successfullyRemoveReplica = useRandomReplica({
   placeholders: ['tag'],
 })
 
+const hadNotThisTagReplica = useReplica({
+  replica: 'У тебя не было тега <b>%tag%</b>',
+  placeholders: ['tag'],
+})
+
 export const deleteTagUseCase =
   ({ deleteTagForUser }: DeleteTagDeps): UseCase<DeleteTagInput> =>
   async ({ userInfo: { userId }, chatInfo: { chatId }, input: { tag } }) => {
@@ -53,8 +59,8 @@ export const deleteTagUseCase =
     const { deleted } = await deleteTagForUser(userId, validated.data, chatId)
 
     if (!deleted) {
-      return { message: `У тебя не было тега <b>${tag}</b>` }
+      return { message: hadNotThisTagReplica({ tag }) }
     }
 
-    return { message: successfullyRemoveReplica({ tag: tag }) }
+    return { message: successfullyRemoveReplica({ tag }) }
   }

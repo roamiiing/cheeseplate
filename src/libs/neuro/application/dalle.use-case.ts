@@ -30,7 +30,6 @@ const problemsReplica = useRandomReplica({
     'Проблемы с Dalle, приходи позже 🥲',
     'Кажется Dalle умерла, подожди и попробуй еще раз 🤧',
   ],
-  placeholders: [],
 })
 
 export const dalleUseCase = ({
@@ -49,7 +48,7 @@ export const dalleUseCase = ({
 
     if (!result) {
       return yield {
-        message: problemsReplica({}),
+        message: problemsReplica(),
       }
     }
 
