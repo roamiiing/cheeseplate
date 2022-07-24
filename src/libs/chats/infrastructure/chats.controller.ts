@@ -17,6 +17,8 @@ export const configureChats =
         bot.use(async (ctx, next) => {
           const chatId = ctx.message?.chat.id
 
+          if (!chatId) return
+
           const exists = await prismaClient.chat.findUnique({
             where: {
               telegramId: chatId,
