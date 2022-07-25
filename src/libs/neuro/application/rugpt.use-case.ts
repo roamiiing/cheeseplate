@@ -1,9 +1,10 @@
 import { GeneratorUseCase, Media } from '@/libs/shared/workflow'
 import { mapZodError } from '@/libs/shared/validation'
 import { useRandomReplica } from '@/libs/shared/random'
-import { RuGptPrompt } from '@/libs/neuro/domain'
+import { processRuGptResult, RuGptPrompt } from '@/libs/neuro/domain'
 import { Time } from '@/libs/shared/units'
 import { useReplica } from '@/libs/shared/strings'
+import { pipe } from 'fp-ts/lib/function'
 
 export const RUGPT_COMMAND = '/rugpt'
 export const RUGPT_TIMEOUT = Time(4, 'm')
@@ -56,6 +57,6 @@ export const ruGptUseCase = ({
     }
 
     yield {
-      message: resultReplica({ result }),
+      message: resultReplica({ result: processRuGptResult(result) }),
     }
   }
