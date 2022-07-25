@@ -12,11 +12,11 @@ export const useRandomReplica =
     replicas,
     placeholders = [],
   }: RandomReplicaOptions<Placeholder>): ReplicaResult<Placeholder> =>
-  placeholderRealValues => {
+  (placeholderRealValues, options) => {
     const replica = getRandomFromArray(replicas)
 
     return useReplica({
       replica,
       placeholders,
-    })(placeholderRealValues)
+    })(placeholderRealValues, options)
   }
