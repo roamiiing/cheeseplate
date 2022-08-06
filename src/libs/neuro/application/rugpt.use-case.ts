@@ -56,8 +56,6 @@ export const ruGptUseCase = ({
       }
     }
 
-    console.log(result)
-
     yield {
       message: resultReplica({ result: processRuGptResult(result) }),
     }
