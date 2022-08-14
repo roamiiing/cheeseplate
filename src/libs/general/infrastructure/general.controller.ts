@@ -1,14 +1,14 @@
-import { Telegraf } from 'telegraf'
 import os from 'os'
 
-import { wrapUseCase } from '@/libs/shared/telegraf'
-import { PriorityBuilder } from '@/libs/shared/workflow'
-import { HELP_COMMAND, DEBUG_COMMAND } from '@/libs/general/application'
+import { Telegraf } from 'telegraf'
 
-import { createGeneralContainer } from './general.container'
-import { PrismaClient } from '@prisma/client'
+import { HELP_COMMAND, DEBUG_COMMAND } from '@/libs/general/application'
 import { information, time } from '@/libs/shared/math'
 import { Queue } from '@/libs/shared/queue'
+import { wrapUseCase } from '@/libs/shared/telegraf'
+import { PriorityBuilder } from '@/libs/shared/workflow'
+
+import { createGeneralContainer } from './general.container'
 
 export type GeneralControllerDeps = {
   bot: Telegraf

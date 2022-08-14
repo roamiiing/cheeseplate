@@ -1,12 +1,8 @@
-import {
-  dalleUseCase,
-  DALLE_COMMAND,
-  RUGPT_COMMAND,
-} from '@/libs/neuro/application'
+import { DALLE_COMMAND, RUGPT_COMMAND } from '@/libs/neuro/application'
+import { CheeseBot } from '@/libs/shared/bot'
 import { PriorityBuilder } from '@/libs/shared/workflow'
 
 import { createNeuroContainer } from './neuro.container'
-import { CheeseBot } from '@/libs/shared/bot'
 
 export type NeuroControllerDeps = {
   cheeseBot: CheeseBot

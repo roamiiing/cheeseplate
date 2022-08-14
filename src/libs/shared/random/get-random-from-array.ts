@@ -13,7 +13,7 @@ export const getRandomFromArray = <T>(
 
   const rand = Math.random()
 
-  let currentProb: number = 0
+  let currentProb = 0
   for (const index in mapped) {
     currentProb += mapped[index]
 

@@ -1,9 +1,11 @@
-import * as React from 'react'
-import { UseCase } from '@/libs/shared/workflow'
-import { getMarkupWith } from '@/libs/shared/react'
-import { Debug, DebugProps } from '../components'
-import { Information, Time } from '@/libs/shared/math'
 import { Duration } from 'luxon'
+import * as React from 'react'
+
+import { Information, Time } from '@/libs/shared/math'
+import { getMarkupWith } from '@/libs/shared/react'
+import { UseCase } from '@/libs/shared/workflow'
+
+import { Debug, DebugProps } from '../components'
 
 export const DEBUG_COMMAND = '/__debug'
 

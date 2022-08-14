@@ -1,13 +1,13 @@
-import { Telegraf } from 'telegraf'
 import { captureException } from '@sentry/node'
+import { Telegraf } from 'telegraf'
 
 import { CheeseBot, InputMapper, Options } from '@/libs/shared/bot'
+import { Queue } from '@/libs/shared/queue'
 import { stripFirst } from '@/libs/shared/strings'
 import { GeneratorUseCase, UseCase } from '@/libs/shared/workflow'
-import { Queue } from '@/libs/shared/queue'
 
-import { processResult, wrapUseCase } from './use-case.wrapper'
 import { wrapGeneratorUseCase } from './generator-use-case.wrapper'
+import { processResult, wrapUseCase } from './use-case.wrapper'
 
 export type TelegrafCheeseBotDeps = {
   bot: Telegraf
@@ -15,20 +15,20 @@ export type TelegrafCheeseBotDeps = {
 }
 
 export class TelegrafCheeseBot implements CheeseBot {
-  constructor(private readonly deps: TelegrafCheeseBotDeps) {}
+  constructor(private readonly _deps: TelegrafCheeseBotDeps) {}
 
   useCommand<Input>(
     command: string,
     useCase: UseCase<Input>,
-    inputMapper: InputMapper<Input> = () => undefined as any,
+    inputMapper: InputMapper<Input> = () => undefined as unknown as Input,
   ) {
-    this.deps.bot.command(command, async ctx => {
+    this._deps.bot.command(command, async ctx => {
       const message = ctx.message.text
 
       await wrapUseCase(
         ctx,
         useCase,
-        this.deps.queue,
+        this._deps.queue,
         inputMapper({
           rawMessage: message,
           strippedMessage: stripFirst(message),
@@ -42,14 +42,15 @@ export class TelegrafCheeseBot implements CheeseBot {
   useGeneratorCommand<Input>(
     command: string,
     useCase: GeneratorUseCase<Input>,
-    inputMapper: InputMapper<Input> | undefined = () => undefined as any,
+    inputMapper: InputMapper<Input> | undefined = () =>
+      undefined as unknown as Input,
     options: Options = {},
   ) {
     const { maxInProgress = Infinity } = options
 
     let inProgress = 0
 
-    this.deps.bot.command(command, ctx => {
+    this._deps.bot.command(command, ctx => {
       ;(async () => {
         if (inProgress < maxInProgress) {
           inProgress++
@@ -59,7 +60,7 @@ export class TelegrafCheeseBot implements CheeseBot {
             await wrapGeneratorUseCase(
               ctx,
               useCase,
-              this.deps.queue,
+              this._deps.queue,
               inputMapper({
                 rawMessage: message,
                 strippedMessage: stripFirst(message),
@@ -78,7 +79,7 @@ export class TelegrafCheeseBot implements CheeseBot {
                 'Прости, но не в этот раз :(\nЭта команда очень ресурсозатратная и сейчас очередь переполнена! Приходи позже 👻',
             },
             ctx,
-            this.deps.queue,
+            this._deps.queue,
           )
         }
       })()

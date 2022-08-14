@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client'
-import { AboutDeps, SetNameDeps } from '@/libs/users/application'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { Telegraf } from 'telegraf'
+
+import { AboutDeps, SetNameDeps } from '@/libs/users/application'
 
 export type CrudDeps = {
   prismaClient: PrismaClient

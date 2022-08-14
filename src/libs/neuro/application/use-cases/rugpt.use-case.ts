@@ -1,8 +1,9 @@
-import { GeneratorUseCase, Media } from '@/libs/shared/workflow'
-import { mapZodError } from '@/libs/shared/validation'
 import { processRuGptResult, RuGptPrompt } from '@/libs/neuro/domain'
-import { Time } from '@/libs/shared/units'
 import { useReplica } from '@/libs/shared/strings'
+import { Time } from '@/libs/shared/units'
+import { mapZodError } from '@/libs/shared/validation'
+import { GeneratorUseCase } from '@/libs/shared/workflow'
+
 import { problemsGptReplica, waitGptReplica } from '../replicas'
 
 export const RUGPT_COMMAND = '/rugpt'

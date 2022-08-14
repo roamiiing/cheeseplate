@@ -1,11 +1,12 @@
-import { prisma, PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+
+import { compareDespiteCasing } from '@/libs/shared/strings'
 import {
   DeleteTagDeps,
   ListTagsDeps,
   PingDeps,
   SetTagDeps,
 } from '@/libs/tags/application'
-import { compareDespiteCasing } from '@/libs/shared/strings'
 
 export type CrudDeps = {
   prismaClient: PrismaClient

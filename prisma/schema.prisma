@@ -36,7 +36,7 @@ model User {
   counters   Counters?
 
   achievements Achievements[]
-              
+
   @@unique([telegramUsername, chatTelegramId])
   @@unique([telegramId, chatTelegramId])
   @@unique([displayName, chatTelegramId])

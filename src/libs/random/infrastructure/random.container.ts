@@ -1,4 +1,5 @@
 import { asFunction, createContainer, InjectionMode } from 'awilix'
+
 import { benUseCase, pickUseCase, rollUseCase } from '@/libs/random/application'
 
 export const createTagsContainer = () => {

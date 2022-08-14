@@ -1,15 +1,15 @@
-type PriorityItem<F extends Function> = {
+type PriorityItem<F extends CallableFunction> = {
   fn: F
   priority?: number
 }
 
-export class PriorityBuilder<F extends Function = Function> {
-  private items: PriorityItem<F>[] = []
+export class PriorityBuilder<F extends CallableFunction = CallableFunction> {
+  private _items: PriorityItem<F>[] = []
 
   add(fn: F, options?: Omit<PriorityItem<F>, 'fn'>) {
     const { priority } = options ?? {}
 
-    this.items.push({
+    this._items.push({
       fn,
       priority,
     })
@@ -18,11 +18,11 @@ export class PriorityBuilder<F extends Function = Function> {
   }
 
   run() {
-    this.items
+    this._items
       .sort(({ priority: a = 0 }, { priority: b = 0 }) => b - a)
       .forEach(({ fn }) => fn())
   }
 }
 
-export const createPriorityBuilder = <F extends Function>() =>
-  new PriorityBuilder()
+export const createPriorityBuilder = <F extends CallableFunction>() =>
+  new PriorityBuilder<F>()

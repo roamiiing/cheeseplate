@@ -1,6 +1,8 @@
+import * as React from 'react'
+
 import { Br } from '@/libs/shared/react'
 import { escapeHtml } from '@/libs/shared/strings'
-import * as React from 'react'
+
 import {
   noTagsReplica,
   noTelegramNicknameReplica,

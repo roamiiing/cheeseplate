@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { pipe } from 'fp-ts/function'
 import {
   asFunction,
   asValue,
@@ -7,19 +6,19 @@ import {
   createContainer,
   InjectionMode,
 } from 'awilix'
+import { pipe } from 'fp-ts/function'
 import { Telegraf } from 'telegraf'
 
-import { PriorityBuilder } from '@/libs/shared/workflow'
-import { CheeseBot } from '@/libs/shared/bot'
-import { configureUsers } from '@/libs/users/infrastructure'
-import { configureTags } from '@/libs/tags/infrastructure'
-import { configureRandom } from '@/libs/random/infrastructure'
-import { configureGeneral } from '@/libs/general/infrastructure'
 import { configureChats } from '@/libs/chats/infrastructure'
+import { configureGeneral } from '@/libs/general/infrastructure'
 import { configureNeuro } from '@/libs/neuro/infrastructure'
-
-import { TelegrafCheeseBot } from '@/libs/shared/telegraf'
+import { configureRandom } from '@/libs/random/infrastructure'
+import { CheeseBot } from '@/libs/shared/bot'
 import { Queue } from '@/libs/shared/queue'
+import { TelegrafCheeseBot } from '@/libs/shared/telegraf'
+import { PriorityBuilder } from '@/libs/shared/workflow'
+import { configureTags } from '@/libs/tags/infrastructure'
+import { configureUsers } from '@/libs/users/infrastructure'
 
 import { bot, prismaClient, botBuilder } from './clients'
 import { getModulesFromMask, Module } from './misc'

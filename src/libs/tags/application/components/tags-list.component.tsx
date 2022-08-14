@@ -1,5 +1,6 @@
-import { Br } from '@/libs/shared/react'
 import * as React from 'react'
+
+import { Br } from '@/libs/shared/react'
 
 type TagsListProps = {
   tags: string[]

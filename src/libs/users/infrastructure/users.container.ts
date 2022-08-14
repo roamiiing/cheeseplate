@@ -1,11 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 import { asFunction, asValue, createContainer, InjectionMode } from 'awilix'
+import { Telegraf } from 'telegraf'
+
 import {
   SetNameDeps,
   setNameUseCase,
   aboutUseCase,
   AboutDeps,
 } from '@/libs/users/application'
+
 import {
   CrudDeps,
   getUserInfo,
@@ -13,7 +16,6 @@ import {
   getUserInfoByTelegramUsername,
   setUserName,
 } from './users.repository'
-import { Telegraf } from 'telegraf'
 
 export type UsersDeps = {
   prismaClient: PrismaClient

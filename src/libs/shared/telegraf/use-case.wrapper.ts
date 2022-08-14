@@ -1,9 +1,9 @@
-import { Context, TelegramError } from 'telegraf'
 import { captureException } from '@sentry/node'
+import { Context, TelegramError } from 'telegraf'
 
-import { UseCase, UseCaseContext, UseCaseResult } from '@/libs/shared/workflow'
-import { Queue, QueueError } from '@/libs/shared/queue'
 import { time } from '@/libs/shared/math'
+import { Queue, QueueError } from '@/libs/shared/queue'
+import { UseCase, UseCaseContext, UseCaseResult } from '@/libs/shared/workflow'
 
 import { mapContext } from './context.mapper'
 
@@ -49,12 +49,12 @@ export const processResult = (
             )
           } else if ('message' in result)
             await ctx.replyWithHTML(result.message, {
-              reply_to_message_id: ctx.message!.message_id,
+              reply_to_message_id: ctx.message?.message_id,
               disable_notification: !notify,
             })
           else if ('gif' in result)
             await ctx.replyWithAnimation(result.gif, {
-              reply_to_message_id: ctx.message!.message_id,
+              reply_to_message_id: ctx.message?.message_id,
               disable_notification: !notify,
             })
         }

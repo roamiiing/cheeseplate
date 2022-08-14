@@ -10,7 +10,7 @@ export const initSentry = () => {
   })
 }
 
-export const captureError = (e: any, ctx: any) => {
+export const captureError = (e: unknown, ctx: unknown) => {
   Sentry.captureException(e, {
     extra: {
       botContext: ctx,

@@ -1,5 +1,6 @@
-import { UseCase } from '@/libs/shared/workflow'
 import { gcd } from '@/libs/shared/math'
+import { UseCase } from '@/libs/shared/workflow'
+
 import { rollReplica } from '../replicas'
 
 export const ROLL_COMMAND = '/roll'

@@ -1,7 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 import { deunionize, Telegraf } from 'telegraf'
 
+import { CheeseBot } from '@/libs/shared/bot'
+import { Queue } from '@/libs/shared/queue'
 import { wrapUseCase } from '@/libs/shared/telegraf'
+import { PriorityBuilder } from '@/libs/shared/workflow'
 import {
   SET_TAG_COMMAND,
   LIST_TAGS_COMMAND,
@@ -9,9 +12,6 @@ import {
   DRY_PING_COMMAND,
 } from '@/libs/tags/application'
 import { TAG_REGEX, TAG_SYMBOL } from '@/libs/tags/domain'
-import { PriorityBuilder } from '@/libs/shared/workflow'
-import { CheeseBot } from '@/libs/shared/bot'
-import { Queue } from '@/libs/shared/queue'
 
 import { createTagsContainer } from './tags.container'
 

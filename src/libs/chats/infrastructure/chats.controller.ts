@@ -1,7 +1,7 @@
+import { PrismaClient } from '@prisma/client'
 import { Telegraf } from 'telegraf'
 
 import { PriorityBuilder } from '@/libs/shared/workflow'
-import { PrismaClient } from '@prisma/client'
 
 export type GeneralControllerDeps = {
   bot: Telegraf

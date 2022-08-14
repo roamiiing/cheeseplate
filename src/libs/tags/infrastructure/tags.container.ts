@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { asFunction, asValue, createContainer, InjectionMode } from 'awilix'
+
 import {
   setTagUseCase,
   SetTagDeps,
@@ -10,6 +11,7 @@ import {
   pingUseCase,
   PingDeps,
 } from '@/libs/tags/application'
+
 import {
   CrudDeps,
   deleteTagForUser,

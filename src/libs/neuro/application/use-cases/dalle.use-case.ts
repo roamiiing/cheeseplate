@@ -1,7 +1,8 @@
-import { GeneratorUseCase, Media } from '@/libs/shared/workflow'
-import { mapZodError } from '@/libs/shared/validation'
 import { DallePrompt } from '@/libs/neuro/domain'
 import { Time } from '@/libs/shared/units'
+import { mapZodError } from '@/libs/shared/validation'
+import { GeneratorUseCase, Media } from '@/libs/shared/workflow'
+
 import { problemsDalleReplica, waitDalleReplica } from '../replicas'
 
 export const DALLE_COMMAND = '/dalle'

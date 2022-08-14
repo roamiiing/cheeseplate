@@ -1,5 +1,6 @@
-import { Time, time } from '@/libs/shared/math'
 import { captureException } from '@sentry/node'
+
+import { Time, time } from '@/libs/shared/math'
 
 export type QueueOptions = {
   /**
@@ -37,30 +38,30 @@ export class QueueError extends Error {
 }
 
 export class Queue {
-  private static WINDOW = time(1, 'm')
+  private static _window = time(1, 'm')
 
-  private readonly options: QueueOptions = {
+  private readonly _options: QueueOptions = {
     overallRpm: 30,
     specialRpm: 30,
     overallRps: 30,
     specialRps: 1,
   }
 
-  private retryTime = new Date(Date.now())
+  private _retryTime = new Date(Date.now())
 
-  private readonly history: History = []
-  private readonly queue: QueuedElement[] = []
+  private readonly _history: History = []
+  private readonly _queue: QueuedElement[] = []
 
   constructor(_options?: Partial<QueueOptions>) {
     if (_options?.overallRpm) {
-      this.options.overallRpm = _options.overallRpm
+      this._options.overallRpm = _options.overallRpm
     }
 
     if (_options?.specialRpm) {
-      this.options.specialRpm = _options.specialRpm
+      this._options.specialRpm = _options.specialRpm
     }
 
-    this.initCounter()
+    this._initCounter()
   }
 
   enqueue(
@@ -73,17 +74,17 @@ export class Queue {
      */
     countsAs = 1,
   ) {
-    this.queue.push({
+    this._queue.push({
       key,
       fn,
       countsAs,
     })
   }
 
-  private isSafeNow(key: number) {
+  private _isSafeNow(key: number) {
     const now = Date.now()
 
-    if (now < this.retryTime.getTime()) {
+    if (now < this._retryTime.getTime()) {
       return false
     }
 
@@ -95,32 +96,32 @@ export class Queue {
     const isInLastSecond = (then: Date) =>
       now - then.getTime() <= time(1, 's').in('ms')
 
-    const overall = this.history.filter(v => isInLastMinute(v.madeAt))
+    const overall = this._history.filter(v => isInLastMinute(v.madeAt))
     const special = overall.filter(isSpecial)
 
     const overallInLastSecond = overall.filter(v => isInLastSecond(v.madeAt))
     const specialInLastSecond = overallInLastSecond.filter(isSpecial)
 
     return (
-      overall.length < this.options.overallRpm &&
-      special.length < this.options.specialRpm &&
-      overallInLastSecond.length < this.options.overallRps &&
-      specialInLastSecond.length < this.options.specialRps
+      overall.length < this._options.overallRpm &&
+      special.length < this._options.specialRpm &&
+      overallInLastSecond.length < this._options.overallRps &&
+      specialInLastSecond.length < this._options.specialRps
     )
   }
 
-  private async initCounter() {
+  private async _initCounter() {
     const promiseFn = async () => {
       const firstUniques = Object.values(
-        this.queue.reduce((acc, val) => {
+        this._queue.reduce((acc, val) => {
           if (!acc[val.key]) acc[val.key] = val
           return acc
         }, {} as Record<number, QueuedElement>),
       )
 
       await Promise.all(
-        firstUniques.map((v, i) => {
-          if (this.isSafeNow(v.key)) {
+        firstUniques.map(v => {
+          if (this._isSafeNow(v.key)) {
             return v
               .fn()
               .then(() => {
@@ -129,28 +130,28 @@ export class Queue {
                   madeAt: new Date(),
                 }
 
-                this.history.push(...Array(v.countsAs).fill(item))
+                this._history.push(...Array(v.countsAs).fill(item))
 
-                this.queue.splice(
-                  this.queue.findIndex(p => p === v),
+                this._queue.splice(
+                  this._queue.findIndex(p => p === v),
                   1,
                 )
 
                 setTimeout(() => {
-                  this.history.splice(
-                    this.history.findIndex(_item => item === _item),
+                  this._history.splice(
+                    this._history.findIndex(_item => item === _item),
                     1,
                   )
-                }, Queue.WINDOW.in('ms'))
+                }, Queue._window.in('ms'))
               })
               .catch(e => {
                 if (e instanceof QueueError) {
-                  this.retryTime = new Date(
+                  this._retryTime = new Date(
                     Math.max(
                       Date.now() +
                         e.retryAfter.in('ms') +
                         time(1, 's').in('ms'),
-                      this.retryTime.getTime(),
+                      this._retryTime.getTime(),
                     ),
                   )
                 } else {
@@ -166,6 +167,7 @@ export class Queue {
     }
 
     // TODO: refactor nicely
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       await promiseFn()
       await new Promise(res => setTimeout(res, 100))

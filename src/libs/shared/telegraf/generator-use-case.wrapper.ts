@@ -1,8 +1,8 @@
 import { Context } from 'telegraf'
 
+import { Queue } from '@/libs/shared/queue'
 import { UseCaseContext } from '@/libs/shared/workflow'
 import { GeneratorUseCase } from '@/libs/shared/workflow'
-import { Queue } from '@/libs/shared/queue'
 
 import { mapContext } from './context.mapper'
 import { processResult } from './use-case.wrapper'

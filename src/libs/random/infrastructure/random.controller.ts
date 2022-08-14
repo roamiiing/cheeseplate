@@ -1,10 +1,10 @@
-import { PriorityBuilder } from '@/libs/shared/workflow'
 import {
   BEN_COMMAND,
   PICK_COMMAND,
   ROLL_COMMAND,
 } from '@/libs/random/application'
 import { CheeseBot } from '@/libs/shared/bot'
+import { PriorityBuilder } from '@/libs/shared/workflow'
 
 import { createTagsContainer } from './random.container'
 

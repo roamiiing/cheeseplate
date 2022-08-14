@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { UseCase } from '@/libs/shared/workflow'
+
 import { getMarkupWith } from '@/libs/shared/react'
-import { Help } from '../components'
+import { UseCase } from '@/libs/shared/workflow'
 
 import commands from '../../../../../data/commands.json'
+import { Help } from '../components'
 
 export const HELP_COMMAND = '/help'
 

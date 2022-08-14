@@ -1,5 +1,6 @@
 import { Context, deunionize } from 'telegraf'
 import { MessageEntity } from 'telegraf/typings/core/types/typegram'
+
 import { UseCaseContext, Entity, EntityType } from '@/libs/shared/workflow'
 
 const mapEntity =
@@ -7,7 +8,7 @@ const mapEntity =
   (v: MessageEntity): Entity => {
     switch (v.type) {
       case 'mention': {
-        const username = deunionize(ctx.message)!.text?.substring(
+        const username = deunionize(ctx.message)?.text?.substring(
           // strip one because of @
           v.offset + 1,
           v.offset + v.length,
@@ -15,7 +16,7 @@ const mapEntity =
 
         return {
           type: EntityType.Mention,
-          username: username!,
+          username: username ?? '',
         }
       }
       case 'text_mention': {
@@ -37,20 +38,24 @@ export const mapContext =
   (input: Input): UseCaseContext<Input> => {
     return {
       userInfo: {
-        userId: BigInt(ctx.message!.from.id),
-        displayName: ctx.message!.from.username ?? ctx.message!.from.first_name,
+        userId: BigInt(ctx.message?.from.id ?? 0),
+        displayName:
+          ctx.message?.from.username ?? ctx.message?.from.first_name ?? '',
       },
       chatInfo: {
-        chatId: BigInt(ctx.message!.chat.id),
+        chatId: BigInt(ctx.message?.chat.id ?? 0),
       },
       messageInfo: {
         entities: (deunionize(ctx.message)?.entities ?? []).map(mapEntity(ctx)),
-        repliedMessageInfo: deunionize(ctx.message)!.reply_to_message && {
+        repliedMessageInfo: deunionize(ctx.message)?.reply_to_message && {
           userInfo: {
-            userId: BigInt(deunionize(ctx.message)!.reply_to_message!.from!.id),
+            userId: BigInt(
+              deunionize(ctx.message)?.reply_to_message?.from?.id ?? 0,
+            ),
             displayName:
-              deunionize(ctx.message)!.reply_to_message!.from!.username ??
-              deunionize(ctx.message)!.reply_to_message!.from!.first_name,
+              deunionize(ctx.message)?.reply_to_message?.from?.username ??
+              deunionize(ctx.message)?.reply_to_message?.from?.first_name ??
+              '',
           },
         },
       },

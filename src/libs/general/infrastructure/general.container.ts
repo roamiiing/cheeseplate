@@ -1,4 +1,5 @@
 import { asFunction, createContainer, InjectionMode } from 'awilix'
+
 import { debugUseCase, helpUseCase } from '@/libs/general/application'
 
 export const createGeneralContainer = () => {

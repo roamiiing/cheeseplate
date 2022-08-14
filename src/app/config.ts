@@ -1,5 +1,6 @@
-import { config } from 'dotenv'
 import { resolve } from 'path'
+
+import { config } from 'dotenv'
 
 const { NODE_ENV, ENV_FILE_PATH } = process.env
 
@@ -12,5 +13,6 @@ config({
 })
 
 if (NODE_ENV === 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   require('source-map-support').install()
 }

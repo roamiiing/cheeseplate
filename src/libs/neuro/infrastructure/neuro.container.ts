@@ -1,10 +1,12 @@
 import { asFunction, createContainer, InjectionMode } from 'awilix'
+
 import {
   DalleDeps,
   dalleUseCase,
   RuGptDeps,
   ruGptUseCase,
 } from '@/libs/neuro/application'
+
 import { requestDalleMiniImages, requestRuGptText } from './neuro.data'
 
 export const createNeuroContainer = () => {

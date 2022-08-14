@@ -1,7 +1,9 @@
-import { UseCase } from '@/libs/shared/workflow'
 import { User, Tag, Chat } from '@prisma/client'
-import { guardReservedTags, TagWithoutSymbol } from '@/libs/tags/domain'
+
 import { mapZodError } from '@/libs/shared/validation'
+import { UseCase } from '@/libs/shared/workflow'
+import { guardReservedTags, TagWithoutSymbol } from '@/libs/tags/domain'
+
 import { hadNotThisTagReplica, successfullyRemoveReplica } from '../replicas'
 
 export const DELETE_TAG_COMMAND = '/deltag'

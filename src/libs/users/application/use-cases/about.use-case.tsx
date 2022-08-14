@@ -1,10 +1,11 @@
+import { User, Chat } from '@prisma/client'
 import * as React from 'react'
+import { deunionize } from 'telegraf'
 
 import { getMarkupWith } from '@/libs/shared/react'
 import { EntityType, UseCase } from '@/libs/shared/workflow'
-import { User, Chat } from '@prisma/client'
+
 import { About, AboutProps } from '../components'
-import { deunionize } from 'telegraf'
 
 export const ABOUT_COMMAND = '/about'
 

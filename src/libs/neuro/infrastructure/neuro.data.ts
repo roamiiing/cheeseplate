@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import {
   DalleDeps,
   DALLE_TIMEOUT,
@@ -5,7 +7,6 @@ import {
   RUGPT_TIMEOUT,
 } from '@/libs/neuro/application'
 import { createFakeHeaders } from '@/libs/shared/http'
-import axios from 'axios'
 
 type DalleMiniResponse = {
   images?: string[] // base64 strings

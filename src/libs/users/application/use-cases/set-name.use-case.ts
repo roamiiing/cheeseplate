@@ -1,7 +1,9 @@
+import { Chat, User } from '@prisma/client'
+
 import { mapZodError } from '@/libs/shared/validation'
 import { UseCase } from '@/libs/shared/workflow'
-import { Chat, User } from '@prisma/client'
 import { Username } from '@/libs/users/domain'
+
 import { alreadyExistsReplica, successfulChangeReplica } from '../replicas'
 
 export const SET_NAME_COMMAND = '/setname'
