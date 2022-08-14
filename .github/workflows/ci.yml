@@ -1,0 +1,32 @@
+name: ci
+
+on: ['push']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+
+      - uses: actions/setup-node@v2
+        name: Setup node
+        with:
+          node-version: '16'
+
+      - name: NPM clean install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format-check
+
+      - name: Type check
+        run: npm run type-check
+
+      - uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
