@@ -12,7 +12,7 @@ export const setUserName =
   ({ prismaClient }: CrudDeps): SetNameDeps['setUserName'] =>
   async (userId, displayName, chatId) => {
     try {
-      const user = await prismaClient.user.update({
+      await prismaClient.user.update({
         where: {
           telegramId_chatTelegramId: {
             telegramId: userId,

@@ -1,2 +1,1 @@
-export * from './set-name.use-case'
-export * from './about.use-case'
+export * from './use-cases'

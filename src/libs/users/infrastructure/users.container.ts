@@ -12,7 +12,7 @@ import {
   getUserInfoByDisplayName,
   getUserInfoByTelegramUsername,
   setUserName,
-} from './users.db'
+} from './users.repository'
 import { Telegraf } from 'telegraf'
 
 export type UsersDeps = {

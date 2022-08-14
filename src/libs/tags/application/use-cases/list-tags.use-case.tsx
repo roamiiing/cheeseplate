@@ -2,7 +2,7 @@ import { getMarkupWith } from '@/libs/shared/react'
 import { UseCase } from '@/libs/shared/workflow'
 import { Tag, Chat } from '@prisma/client'
 import * as React from 'react'
-import { TagsList } from './components'
+import { TagsList } from '../components'
 
 export const LIST_TAGS_COMMAND = '/taglist'
 

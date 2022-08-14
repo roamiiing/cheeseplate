@@ -17,7 +17,7 @@ import {
   getUsersWithTags,
   listTags,
   setTagForUser,
-} from './tags.db'
+} from './tags.repository'
 
 export type TagsDeps = {
   prismaClient: PrismaClient

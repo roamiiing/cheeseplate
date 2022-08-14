@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { UseCase } from '@/libs/shared/workflow'
 import { getMarkupWith } from '@/libs/shared/react'
-import { Debug, DebugProps } from './components'
+import { Debug, DebugProps } from '../components'
 import { Information, Time } from '@/libs/shared/math'
+import { Duration } from 'luxon'
 
 export const DEBUG_COMMAND = '/__debug'
 
@@ -26,7 +27,7 @@ export const debugUseCase =
       ram: `${Math.floor(ram.process.in('MB'))}/${Math.floor(
         ram.total.in('MB'),
       )} MB`,
-      uptime: uptime.toString('h'),
+      uptime: Duration.fromMillis(uptime.in('ms')).toFormat('hh:mm:ss'),
     }
 
     return {

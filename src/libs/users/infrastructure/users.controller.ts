@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client'
 import { Telegraf } from 'telegraf'
 
 import { SET_NAME_COMMAND, ABOUT_COMMAND } from '@/libs/users/application'
-import { wrapUseCase } from '@/libs/shared/telegraf'
 import { PriorityBuilder } from '@/libs/shared/workflow'
 import { CheeseBot } from '@/libs/shared/bot'
 

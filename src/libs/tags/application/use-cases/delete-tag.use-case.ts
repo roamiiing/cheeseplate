@@ -2,8 +2,7 @@ import { UseCase } from '@/libs/shared/workflow'
 import { User, Tag, Chat } from '@prisma/client'
 import { guardReservedTags, TagWithoutSymbol } from '@/libs/tags/domain'
 import { mapZodError } from '@/libs/shared/validation'
-import { useRandomReplica } from '@/libs/shared/random'
-import { useReplica } from '@/libs/shared/strings'
+import { hadNotThisTagReplica, successfullyRemoveReplica } from '../replicas'
 
 export const DELETE_TAG_COMMAND = '/deltag'
 
@@ -20,24 +19,6 @@ export type DeleteTagDeps = {
 export type DeleteTagInput = {
   tag: Tag['tag']
 }
-
-const successfullyRemoveReplica = useRandomReplica({
-  replicas: [
-    'Ты больше не <s>титан</s> <b>%tag%</b> 🕶',
-    'Окей, с позором вышвыриваем из секты <b>%tag%</b> 🤬️',
-    'Клуб <b>%tag%</b> сказал bye-bye? Не переживай, с клубом <s>рукожопов</s> ты всегда на своем месте 🤡',
-    'Может после отказа от <b>%tag%</b>, ты всё-таки выберешь веревку, мыло, и старую табуретку?????? 🤪',
-    'Ой, больно надо, чмоня. Как будто уж больно нужен <b>%tag%</b> 🤢',
-    'Знаешь что делают на западе с теми, кто отказывается от <b>%tag%</b>? 🤐',
-    'Нет слов, одни эмоции, <b>%tag%</b> покинул твой списочек 💅',
-  ],
-  placeholders: ['tag'],
-})
-
-const hadNotThisTagReplica = useReplica({
-  replica: 'У тебя не было тега <b>%tag%</b>',
-  placeholders: ['tag'],
-})
 
 export const deleteTagUseCase =
   ({ deleteTagForUser }: DeleteTagDeps): UseCase<DeleteTagInput> =>

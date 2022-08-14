@@ -21,6 +21,7 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.8",
+    "@types/luxon": "^3.0.0",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.3",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
@@ -53,6 +54,7 @@
     "fastify": "^3.25.3",
     "fastify-swagger": "^4.15.0",
     "fp-ts": "^2.11.8",
+    "luxon": "^3.0.1",
     "metriqa": "^0.1.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
