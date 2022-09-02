@@ -17,9 +17,18 @@ export const rollUseCase =
     const divider = gcd(prob, 100)
     const fraction = `${prob / divider} случаев из ${100 / divider}`
 
-    if (!message) return { message: `${prob}%` }
+    if (!message)
+      return {
+        message: `${prob}%`,
+        options: {
+          cleanupMessages: false,
+        },
+      }
 
     return {
       message: rollReplica({ message, prob: prob.toString(10), fraction }),
+      options: {
+        cleanupMessages: false,
+      },
     }
   }

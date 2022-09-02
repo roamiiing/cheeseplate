@@ -3,6 +3,10 @@ import { Media } from './media'
 
 export type UseCaseResultOptions = {
   notify?: boolean
+  /**
+   * @default true
+   */
+  cleanupMessages?: boolean
 }
 
 export type UseCaseResult = (

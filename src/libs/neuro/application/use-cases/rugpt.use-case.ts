@@ -32,7 +32,12 @@ export const ruGptUseCase = ({
       return yield { message: mapZodError(validated.error) }
     }
 
-    yield { message: waitGptReplica({ prompt: validated.data }) }
+    yield {
+      message: waitGptReplica({ prompt: validated.data }),
+      options: {
+        cleanupMessages: false,
+      },
+    }
 
     const result = await requestRuGptText(validated.data)
 
@@ -44,5 +49,8 @@ export const ruGptUseCase = ({
 
     yield {
       message: resultReplica({ result: processRuGptResult(result) }),
+      options: {
+        cleanupMessages: false,
+      },
     }
   }

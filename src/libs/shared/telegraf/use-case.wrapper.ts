@@ -1,5 +1,6 @@
 import { captureException } from '@sentry/node'
 import { Context, TelegramError } from 'telegraf'
+import { Message } from 'typegram'
 
 import { time } from '@/libs/shared/math'
 import { Queue, QueueError } from '@/libs/shared/queue'
@@ -26,7 +27,9 @@ export const processResult = (
   queue.enqueue(
     ctx.message?.chat.id ?? Infinity,
     async () => {
-      const { notify = false } = result?.options ?? {}
+      const { notify = false, cleanupMessages = true } = result?.options ?? {}
+
+      const sentMessages: Message[] = []
 
       try {
         if (result) {
@@ -34,29 +37,46 @@ export const processResult = (
             const media = result.media
 
             // add more types if needed
-            await ctx.replyWithMediaGroup(
-              media.map(image => ({
-                type: 'photo',
-                media: {
-                  source: image.imageData,
+            sentMessages.push(
+              ...(await ctx.replyWithMediaGroup(
+                media.map(image => ({
+                  type: 'photo',
+                  media: {
+                    source: image.imageData,
+                  },
+                })),
+                {
+                  reply_to_message_id: ctx.message?.message_id,
+                  allow_sending_without_reply: true,
+                  disable_notification: !notify,
                 },
-              })),
-              {
-                reply_to_message_id: ctx.message?.message_id,
-                allow_sending_without_reply: true,
-                disable_notification: !notify,
-              },
+              )),
             )
           } else if ('message' in result)
-            await ctx.replyWithHTML(result.message, {
-              reply_to_message_id: ctx.message?.message_id,
-              disable_notification: !notify,
-            })
+            sentMessages.push(
+              await ctx.replyWithHTML(result.message, {
+                reply_to_message_id: ctx.message?.message_id,
+                disable_notification: !notify,
+              }),
+            )
           else if ('gif' in result)
-            await ctx.replyWithAnimation(result.gif, {
-              reply_to_message_id: ctx.message?.message_id,
-              disable_notification: !notify,
-            })
+            sentMessages.push(
+              await ctx.replyWithAnimation(result.gif, {
+                reply_to_message_id: ctx.message?.message_id,
+                disable_notification: !notify,
+              }),
+            )
+        }
+
+        if (cleanupMessages) {
+          sentMessages.forEach(message => {
+            setTimeout(() => {
+              queue.enqueue(message.chat.id, async () => {
+                ctx.deleteMessage(message.message_id)
+                ctx.deleteMessage(ctx.message?.message_id)
+              })
+            }, time(1, 'm').in('ms'))
+          })
         }
       } catch (e) {
         const retryAfter = (e as TelegramError)?.response?.parameters

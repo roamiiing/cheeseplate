@@ -32,5 +32,8 @@ export const pickUseCase =
 
     return {
       message: pickReplica({ choice }),
+      options: {
+        cleanupMessages: false,
+      },
     }
   }

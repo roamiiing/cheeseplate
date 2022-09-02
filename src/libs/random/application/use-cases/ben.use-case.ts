@@ -18,5 +18,10 @@ export type BenInput = void
 export const benUseCase = (): UseCase<BenInput> => async () => {
   const gif = getRandomFromArray(BEN_GIFS, GIFS_PROBABILITIES)
 
-  return { gif }
+  return {
+    gif,
+    options: {
+      cleanupMessages: false,
+    },
+  }
 }

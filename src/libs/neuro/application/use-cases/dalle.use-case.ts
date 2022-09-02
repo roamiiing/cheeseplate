@@ -23,10 +23,17 @@ export const dalleUseCase = ({
     const validated = await DallePrompt.safeParseAsync(prompt)
 
     if (!validated.success) {
-      return yield { message: mapZodError(validated.error) }
+      return yield {
+        message: mapZodError(validated.error),
+      }
     }
 
-    yield { message: waitDalleReplica({ prompt: validated.data }) }
+    yield {
+      message: waitDalleReplica({ prompt: validated.data }),
+      options: {
+        cleanupMessages: false,
+      },
+    }
 
     const result = await requestDalleMiniImages(validated.data)
 
@@ -38,5 +45,8 @@ export const dalleUseCase = ({
 
     yield {
       media: result,
+      options: {
+        cleanupMessages: false,
+      },
     }
   }
