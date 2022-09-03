@@ -57,6 +57,7 @@ export const pingUseCase =
         ),
         options: {
           notify: true,
+          cleanupMessages: false,
         },
       }
     }
@@ -67,5 +68,8 @@ export const pingUseCase =
       message: drypingReplica({
         data: users.map(({ displayName }) => `${displayName}`).join(', '),
       }),
+      options: {
+        cleanupMessages: false,
+      },
     }
   }
