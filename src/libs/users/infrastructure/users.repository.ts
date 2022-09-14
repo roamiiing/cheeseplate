@@ -19,24 +19,30 @@ export const upsertUser = ({
   prismaClient,
   cache,
 }: CrudDeps): UpsertUserDeps['upsertUser'] =>
-  cache.memoize('upsertUser', async user => {
-    await prismaClient.user.upsert({
-      where: {
-        telegramId_chatTelegramId: {
+  cache.memoize(
+    'upsertUser',
+    async user => {
+      await prismaClient.user.upsert({
+        where: {
+          telegramId_chatTelegramId: {
+            telegramId: user.telegramId,
+            chatTelegramId: user.chatTelegramId,
+          },
+        },
+        update: {
+          telegramUsername: user.telegramUsername,
+        },
+        create: {
           telegramId: user.telegramId,
           chatTelegramId: user.chatTelegramId,
+          displayName: user.telegramUsername ?? user.firstName,
         },
-      },
-      update: {
-        telegramUsername: user.telegramUsername,
-      },
-      create: {
-        telegramId: user.telegramId,
-        chatTelegramId: user.chatTelegramId,
-        displayName: user.telegramUsername ?? user.firstName,
-      },
-    })
-  })
+      })
+    },
+    {
+      ttl: 'infinite',
+    },
+  )
 
 export const setUserName =
   ({ prismaClient }: CrudDeps): SetNameDeps['setUserName'] =>

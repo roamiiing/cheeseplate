@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { Telegraf } from 'telegraf'
 
+import { Time } from '@/libs/shared/units'
 import { Cache, PriorityBuilder } from '@/libs/shared/workflow'
 
 export type GeneralControllerDeps = {
@@ -22,6 +23,9 @@ export const configureChats =
             telegramId: id,
           },
         }),
+      {
+        ttl: Time(1, 'h'),
+      },
     )
 
     botBuilder.add(

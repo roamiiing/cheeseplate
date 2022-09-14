@@ -2,29 +2,24 @@ import { defu } from 'defu'
 import bjson from 'json-bigint'
 
 import { Time } from '@/libs/shared/units'
-import { Cache } from '@/libs/shared/workflow'
-
-type CacheMemoryOptions = {
-  /**
-   * If set to 'infinite', will never be invalidated
-   * @default 5 hours
-   */
-  defaultTtl: Time | 'infinite'
-}
+import { Cache, CacheOptions } from '@/libs/shared/workflow'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
 export class CacheMemory implements Cache {
-  constructor(options?: Partial<CacheMemoryOptions>) {
+  constructor(options?: Partial<CacheOptions>) {
     this._options = defu(options, {
-      defaultTtl: Time(5, 'h'),
+      ttl: Time(5, 'h'),
     })
   }
 
   memoize<T, R>(
     fnName: string,
     fn: (arg: T) => Promise<R>,
+    options?: Partial<CacheOptions>,
   ): (arg: T) => Promise<R> {
+    const resultOptions = defu(options, this._options)
+
     const wrappedFn = async (arg: T): Promise<R> => {
       const key = CacheMemory._getMapKey(fnName, arg)
 
@@ -43,11 +38,8 @@ export class CacheMemory implements Cache {
       const result = await fn(arg)
       this._map.set(key, result)
 
-      if (this._options.defaultTtl !== 'infinite') {
-        setTimeout(
-          () => this._map.delete(key),
-          this._options.defaultTtl.in('ms'),
-        )
+      if (resultOptions.ttl !== 'infinite') {
+        setTimeout(() => this._map.delete(key), resultOptions.ttl.in('ms'))
       }
 
       return result
@@ -66,7 +58,7 @@ export class CacheMemory implements Cache {
     }
   }
 
-  private _options: CacheMemoryOptions
+  private _options: CacheOptions
 
   private _map = new Map<string, unknown>()
 
