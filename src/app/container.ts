@@ -14,9 +14,10 @@ import { configureGeneral } from '@/libs/general/infrastructure'
 import { configureNeuro } from '@/libs/neuro/infrastructure'
 import { configureRandom } from '@/libs/random/infrastructure'
 import { CheeseBot } from '@/libs/shared/bot'
+import { CacheMemory } from '@/libs/shared/cache-memory'
 import { Queue } from '@/libs/shared/queue'
 import { TelegrafCheeseBot } from '@/libs/shared/telegraf'
-import { PriorityBuilder } from '@/libs/shared/workflow'
+import { Cache, PriorityBuilder } from '@/libs/shared/workflow'
 import { configureTags } from '@/libs/tags/infrastructure'
 import { configureUsers } from '@/libs/users/infrastructure'
 
@@ -70,6 +71,7 @@ export const appContainer = createContainer<
     prismaClient: PrismaClient
     cheeseBot: CheeseBot
     queue: Queue
+    cache: Cache
     configureModules: ReturnType<typeof configureModules>
   } & ConfigureModulesDeps
 >({
@@ -79,6 +81,7 @@ export const appContainer = createContainer<
   botBuilder: asValue(botBuilder),
   prismaClient: asValue(prismaClient),
   queue: asValue(new Queue()),
+  cache: asValue(new CacheMemory()),
 
   cheeseBot: asClass(TelegrafCheeseBot),
 

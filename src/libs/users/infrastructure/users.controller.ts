@@ -2,24 +2,27 @@ import { PrismaClient } from '@prisma/client'
 import { Telegraf } from 'telegraf'
 
 import { CheeseBot } from '@/libs/shared/bot'
-import { PriorityBuilder } from '@/libs/shared/workflow'
+import { Cache, PriorityBuilder } from '@/libs/shared/workflow'
 import { SET_NAME_COMMAND, ABOUT_COMMAND } from '@/libs/users/application'
 
 import { createUsersContainer } from './users.container'
+import { toUpsertUser } from './users.mapper'
 
 export type UsersControllerDeps = {
   bot: Telegraf
   botBuilder: PriorityBuilder
   prismaClient: PrismaClient
   cheeseBot: CheeseBot
+  cache: Cache
 }
 
 export const configureUsers =
-  ({ bot, prismaClient, botBuilder, cheeseBot }: UsersControllerDeps) =>
+  ({ bot, prismaClient, botBuilder, cheeseBot, cache }: UsersControllerDeps) =>
   () => {
     const usersContainer = createUsersContainer({
       prismaClient,
       bot,
+      cache,
     })
 
     botBuilder
@@ -44,25 +47,9 @@ export const configureUsers =
       .add(
         () =>
           bot.use(async (ctx, next) => {
-            if (ctx.message) {
-              await prismaClient.user.upsert({
-                where: {
-                  telegramId_chatTelegramId: {
-                    telegramId: ctx.message.from.id,
-                    chatTelegramId: ctx.message.chat.id,
-                  },
-                },
-                update: {
-                  telegramUsername: ctx.message.from.username,
-                },
-                create: {
-                  telegramId: ctx.message.from.id,
-                  chatTelegramId: ctx.message.chat.id,
-                  displayName:
-                    ctx.message.from.username ?? ctx.message.from.first_name,
-                },
-              })
-            }
+            const user = toUpsertUser(ctx.message)
+
+            await usersContainer.cradle.upsertUserMiddleware(user)
 
             return next()
           }),

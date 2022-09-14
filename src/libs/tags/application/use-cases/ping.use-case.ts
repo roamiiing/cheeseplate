@@ -32,6 +32,8 @@ export const pingUseCase =
     userInfo: { userId },
     input: { tags, dry = false },
   }) => {
+    if (tags.length === 0) return
+
     const users = await (tags.includes(ALL_TAG)
       ? getAllUsersInChat(chatId, !dry ? Number(userId) : undefined)
       : getUsersWithTags(tags, chatId, !dry ? Number(userId) : undefined))

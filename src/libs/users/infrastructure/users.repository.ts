@@ -2,12 +2,41 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { Telegraf } from 'telegraf'
 
-import { AboutDeps, SetNameDeps } from '@/libs/users/application'
+import { Cache } from '@/libs/shared/workflow'
+import {
+  AboutDeps,
+  SetNameDeps,
+  UpsertUserDeps,
+} from '@/libs/users/application'
 
 export type CrudDeps = {
   prismaClient: PrismaClient
   bot: Telegraf
+  cache: Cache
 }
+
+export const upsertUser = ({
+  prismaClient,
+  cache,
+}: CrudDeps): UpsertUserDeps['upsertUser'] =>
+  cache.memoize('upsertUser', async user => {
+    await prismaClient.user.upsert({
+      where: {
+        telegramId_chatTelegramId: {
+          telegramId: user.telegramId,
+          chatTelegramId: user.chatTelegramId,
+        },
+      },
+      update: {
+        telegramUsername: user.telegramUsername,
+      },
+      create: {
+        telegramId: user.telegramId,
+        chatTelegramId: user.chatTelegramId,
+        displayName: user.telegramUsername ?? user.firstName,
+      },
+    })
+  })
 
 export const setUserName =
   ({ prismaClient }: CrudDeps): SetNameDeps['setUserName'] =>
