@@ -25,6 +25,9 @@ export const dalleUseCase = ({
     if (!validated.success) {
       return yield {
         message: mapZodError(validated.error),
+        options: {
+          success: false,
+        },
       }
     }
 
@@ -40,6 +43,9 @@ export const dalleUseCase = ({
     if (!result) {
       return yield {
         message: problemsDalleReplica(),
+        options: {
+          success: false,
+        },
       }
     }
 

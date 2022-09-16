@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { deunionize, Telegraf } from 'telegraf'
 
+import { sendEvent } from '@/libs/shared/analytics-client'
 import { CheeseBot } from '@/libs/shared/bot'
 import { Queue } from '@/libs/shared/queue'
 import { wrapUseCase } from '@/libs/shared/telegraf'
@@ -71,6 +72,14 @@ export const configureTags =
             ]
               .map(([str]) => str)
               .map(str => str.replace(TAG_SYMBOL, ''))
+
+            if (tags.length > 0) {
+              sendEvent('ping', {
+                chatId: ctx.chat?.id.toString() ?? '',
+                all: tags.includes('all'),
+                length: tags.length,
+              })
+            }
 
             // TODO: move to cheeseBot
             await wrapUseCase(ctx, tagsContainer.cradle.pingUseCase, queue, {

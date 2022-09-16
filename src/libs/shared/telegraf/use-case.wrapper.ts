@@ -6,6 +6,7 @@ import { time } from '@/libs/shared/math'
 import { Queue, QueueError } from '@/libs/shared/queue'
 import { UseCase, UseCaseContext, UseCaseResult } from '@/libs/shared/workflow'
 
+import { AnalyticsContext, sendCommandAnalytics } from './analytics'
 import { mapContext } from './context.mapper'
 
 export const wrapUseCase = async <Input>(
@@ -13,10 +14,19 @@ export const wrapUseCase = async <Input>(
   useCase: UseCase<Input>,
   queue: Queue,
   input?: Input,
+  analyticsCtx?: AnalyticsContext,
 ) => {
   const result = await useCase(mapContext(ctx)(input) as UseCaseContext<Input>)
 
   processResult(result, ctx, queue)
+  sendCommandAnalytics({
+    ...analyticsCtx,
+    data: {
+      ...analyticsCtx?.data,
+      chatId: ctx.chat?.id.toString() ?? '',
+      success: result?.options?.success ?? true,
+    },
+  })
 }
 
 export const processResult = (

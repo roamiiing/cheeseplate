@@ -30,17 +30,32 @@ export const setTagUseCase =
   ({ setTagForUser }: SetTagDeps): UseCase<SetTagInput> =>
   async ({ userInfo: { userId }, chatInfo: { chatId }, input: { tag } }) => {
     if (!tag) {
-      return { message: 'А тег указать? <pre>/settag тег</pre>' }
+      return {
+        message: 'А тег указать? <pre>/settag тег</pre>',
+        options: {
+          success: false,
+        },
+      }
     }
 
     const validated = await TagWithoutSymbol.safeParseAsync(tag)
 
     if (!validated.success) {
-      return { message: mapZodError(validated.error) }
+      return {
+        message: mapZodError(validated.error),
+        options: {
+          success: false,
+        },
+      }
     }
 
     if (!guardReservedTags(validated.data)) {
-      return { message: reservedTagReplica() }
+      return {
+        message: reservedTagReplica(),
+        options: {
+          success: false,
+        },
+      }
     }
 
     const { newlyInserted } = await setTagForUser(
@@ -50,7 +65,12 @@ export const setTagUseCase =
     )
 
     if (!newlyInserted) {
-      return { message: alreadyHasTagReplica({ tag }) }
+      return {
+        message: alreadyHasTagReplica({ tag }),
+        options: {
+          success: false,
+        },
+      }
     }
 
     return {
