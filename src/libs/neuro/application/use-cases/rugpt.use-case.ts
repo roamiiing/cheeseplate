@@ -29,10 +29,7 @@ export const ruGptUseCase = ({
     const validated = await RuGptPrompt.safeParseAsync(prompt)
 
     if (!validated.success) {
-      return yield {
-        message: mapZodError(validated.error),
-        options: { success: false },
-      }
+      return yield { message: mapZodError(validated.error) }
     }
 
     yield {
@@ -47,9 +44,6 @@ export const ruGptUseCase = ({
     if (!result) {
       return yield {
         message: problemsGptReplica({}),
-        options: {
-          success: false,
-        },
       }
     }
 

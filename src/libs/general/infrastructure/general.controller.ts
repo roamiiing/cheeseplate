@@ -3,7 +3,6 @@ import os from 'os'
 import { Telegraf } from 'telegraf'
 
 import { HELP_COMMAND, DEBUG_COMMAND } from '@/libs/general/application'
-import { CheeseBot } from '@/libs/shared/bot'
 import { information, time } from '@/libs/shared/math'
 import { Queue } from '@/libs/shared/queue'
 import { wrapUseCase } from '@/libs/shared/telegraf'
@@ -14,18 +13,21 @@ import { createGeneralContainer } from './general.container'
 export type GeneralControllerDeps = {
   bot: Telegraf
   botBuilder: PriorityBuilder
-  cheeseBot: CheeseBot
   queue: Queue
 }
 
 export const configureGeneral =
-  ({ cheeseBot, bot, botBuilder, queue }: GeneralControllerDeps) =>
+  ({ bot, botBuilder, queue }: GeneralControllerDeps) =>
   () => {
     const generalContainer = createGeneralContainer()
 
     botBuilder
       .add(() =>
-        cheeseBot.useCommand(HELP_COMMAND, generalContainer.cradle.helpUseCase),
+        bot.command(
+          HELP_COMMAND,
+          async ctx =>
+            await wrapUseCase(ctx, generalContainer.cradle.helpUseCase, queue),
+        ),
       )
       .add(
         () =>

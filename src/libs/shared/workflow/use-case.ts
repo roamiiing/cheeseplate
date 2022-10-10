@@ -7,10 +7,6 @@ export type UseCaseResultOptions = {
    * @default true
    */
   cleanupMessages?: boolean
-  /**
-   * @default boolean
-   */
-  success?: boolean
 }
 
 export type UseCaseResult = (

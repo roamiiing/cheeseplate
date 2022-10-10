@@ -26,43 +26,23 @@ export const deleteTagUseCase =
   ({ deleteTagForUser }: DeleteTagDeps): UseCase<DeleteTagInput> =>
   async ({ userInfo: { userId }, chatInfo: { chatId }, input: { tag } }) => {
     if (!tag) {
-      return {
-        message: `А тег указать? <pre>${DELETE_TAG_COMMAND}</pre>`,
-        options: {
-          success: false,
-        },
-      }
+      return { message: `А тег указать? <pre>${DELETE_TAG_COMMAND}</pre>` }
     }
 
     const validated = await TagWithoutSymbol.safeParseAsync(tag)
 
     if (!validated.success) {
-      return {
-        message: mapZodError(validated.error),
-        options: {
-          success: false,
-        },
-      }
+      return { message: mapZodError(validated.error) }
     }
 
     if (!guardReservedTags(validated.data)) {
-      return {
-        message: 'Это зарезервированный тег',
-        options: {
-          success: false,
-        },
-      }
+      return { message: 'Это зарезервированный тег' }
     }
 
     const { deleted } = await deleteTagForUser(userId, validated.data, chatId)
 
     if (!deleted) {
-      return {
-        message: hadNotThisTagReplica({ tag }),
-        options: {
-          success: false,
-        },
-      }
+      return { message: hadNotThisTagReplica({ tag }) }
     }
 
     return { message: successfullyRemoveReplica({ tag }) }

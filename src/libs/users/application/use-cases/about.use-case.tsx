@@ -55,10 +55,5 @@ export const aboutUseCase =
       ? getUserInfoByDisplayName(displayName, chatId)
       : getUserInfo(searchUserId, chatId))
 
-    return {
-      message: getMarkupWith(<About userInfo={userInfo} />),
-      options: {
-        success: !!userInfo,
-      },
-    }
+    return { message: getMarkupWith(<About userInfo={userInfo} />) }
   }

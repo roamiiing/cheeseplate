@@ -34,21 +34,12 @@ export const setNameUseCase =
     if (!validated.success) {
       return {
         message: mapZodError(validated.error),
-        options: {
-          success: false,
-        },
       }
     }
 
     const { alreadyExists } = await setUserName(userId, validated.data, chatId)
 
-    if (alreadyExists)
-      return {
-        message: alreadyExistsReplica({ displayName }),
-        options: {
-          success: false,
-        },
-      }
+    if (alreadyExists) return { message: alreadyExistsReplica({ displayName }) }
 
     return {
       message: successfulChangeReplica({

@@ -21,10 +21,7 @@ export class TelegrafCheeseBot implements CheeseBot {
     command: string,
     useCase: UseCase<Input>,
     inputMapper: InputMapper<Input> = () => undefined as unknown as Input,
-    options: Options = {},
   ) {
-    const { handleAnalytics = true } = options
-
     this._deps.bot.command(command, async ctx => {
       const message = ctx.message.text
 
@@ -36,10 +33,6 @@ export class TelegrafCheeseBot implements CheeseBot {
           rawMessage: message,
           strippedMessage: stripFirst(message),
         }),
-        {
-          handleAnalytics,
-          command,
-        },
       )
     })
 
@@ -53,7 +46,7 @@ export class TelegrafCheeseBot implements CheeseBot {
       undefined as unknown as Input,
     options: Options = {},
   ) {
-    const { maxInProgress = Infinity, handleAnalytics = true } = options
+    const { maxInProgress = Infinity } = options
 
     let inProgress = 0
 
@@ -72,10 +65,6 @@ export class TelegrafCheeseBot implements CheeseBot {
                 rawMessage: message,
                 strippedMessage: stripFirst(message),
               }),
-              {
-                handleAnalytics,
-                command,
-              },
             )
           } catch (e) {
             console.error('Error with telegram answering', e)

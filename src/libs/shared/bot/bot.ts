@@ -16,7 +16,6 @@ export type InputMapper<Input> = (context: {
 
 export type Options = {
   maxInProgress?: number
-  handleAnalytics?: boolean
 }
 
 export interface CheeseBot {
