@@ -38,7 +38,7 @@
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
     "prettier-plugin-prisma": "^3.8.0",
-    "prisma": "^3.10.0",
+    "prisma": "^4.4.0",
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^3.14.1",
     "typescript": "^4.5.4",
@@ -48,7 +48,7 @@
     "zx": "^6.1.0"
   },
   "dependencies": {
-    "@prisma/client": "^3.10.0",
+    "@prisma/client": "^4.4.0",
     "@sentry/node": "^6.18.1",
     "@sentry/tracing": "^6.18.1",
     "awilix": "^6.1.0",

@@ -1,23 +1,11 @@
-# This compose-file is intended to be used for development just to run the needed databases.
-# In the future, docker configuration will be extended to run
-
-version: '3.9'
+version: '3.8'
 
 services:
-  pg:
-    image: arm64v8/postgres:14.2
-    environment:
-      POSTGRES_DB: 'granatdev'
-      POSTGRES_USER: 'granatdevuser'
-      POSTGRES_PASSWORD: 'supersecure'
-      PGDATA: '/var/lib/postgresql/data/pgdata'
-    volumes:
-      - ./localvolumes/pg:/var/lib/postgresql/data
+  crdb:
+    container_name: crdb
+    hostname: crdb
+    image: cockroachdb/cockroach:latest
+    command: start-single-node --cluster-name=example-single-node --insecure
     ports:
-      - '5432:5432'
-    networks:
-      - granetwork
+      - "26257:26257"
 
-networks:
-  granetwork:
-    driver: bridge
