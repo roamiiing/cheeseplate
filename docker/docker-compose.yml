@@ -7,5 +7,4 @@ services:
     image: cockroachdb/cockroach:latest
     command: start-single-node --cluster-name=example-single-node --insecure
     ports:
-      - "26257:26257"
-
+      - '26257:26257'
