@@ -82,7 +82,6 @@ export const createAppContainer = () =>
     bot: asValue(bot),
     botBuilder: asValue(botBuilder),
     prismaClient: asValue(prismaClient),
-    queue: asValue(new Queue()),
     cache: asValue(new CacheMemory()),
 
     cheeseBot: asClass(TelegrafCheeseBot),

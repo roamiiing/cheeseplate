@@ -18,11 +18,12 @@ type DebugInput = {
     }
     uptime: Time
   }
+  cacheInfo: DebugProps['cacheInfo']
 }
 
 export const debugUseCase =
   (): UseCase<DebugInput> =>
-  async ({ input: { chatInfo, serverInfo } }) => {
+  async ({ input: { chatInfo, serverInfo, cacheInfo } }) => {
     const { ram, uptime } = serverInfo
 
     const mappedServerInfo = {
@@ -34,7 +35,11 @@ export const debugUseCase =
 
     return {
       message: getMarkupWith(
-        <Debug chatInfo={chatInfo} serverInfo={mappedServerInfo} />,
+        <Debug
+          chatInfo={chatInfo}
+          serverInfo={mappedServerInfo}
+          cacheInfo={cacheInfo}
+        />,
       ),
     }
   }

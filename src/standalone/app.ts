@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 
+import { asValue } from 'awilix'
 import { config } from 'dotenv'
 
 const { NODE_ENV, ENV_FILE_PATH } = process.env
@@ -19,6 +20,7 @@ if (NODE_ENV === 'production') {
 
 import { captureError, initSentry } from '@/app'
 import { createAppContainer } from '@/app/container'
+import { PromiseQueue } from '@/libs/shared/queue'
 
 const {
   // include all features by default
@@ -26,6 +28,10 @@ const {
 } = process.env
 
 const appContainer = createAppContainer()
+
+appContainer.register({
+  queue: asValue(new PromiseQueue()),
+})
 
 if (process.env.NODE_ENV === 'production') {
   initSentry()

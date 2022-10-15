@@ -8,6 +8,10 @@ export type CacheOptions = {
   ttl: Time | 'infinite'
 }
 
+export type CacheDebugInfo = {
+  entries: number
+}
+
 export interface Cache {
   memoize<T, R>(
     fnName: string,
@@ -16,4 +20,6 @@ export interface Cache {
   ): (arg: T) => Promise<R>
 
   invalidate(fnName: string): Promise<void>
+
+  getDebugInfo(): Promise<CacheDebugInfo>
 }
