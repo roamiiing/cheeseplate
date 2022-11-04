@@ -28,6 +28,14 @@ if (process.env.NODE_ENV === 'production') {
 
 appContainer.cradle.configureModules(parseInt(FEATURES_MASK, 10))
 
+appContainer.cradle.botBuilder.add(
+  () => {
+    appContainer.cradle.prismaClient.$connect()
+  },
+  {
+    priority: 50,
+  },
+)
 appContainer.cradle.botBuilder.run()
 
 appContainer.cradle.bot.catch((err, ctx) => {
