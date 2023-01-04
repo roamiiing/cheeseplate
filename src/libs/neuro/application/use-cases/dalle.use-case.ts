@@ -7,11 +7,6 @@ export type DalleDeps = {
   requestDalleMiniImages: (prompt: string) => Promise<ImageBuffer[]>
   dalleSemaphore: Semaphore
 }
-
-export type DeleteTagInput = {
-  prompt: string
-}
-
 export const enum DalleStatus {
   Wait,
   UnderLoad,

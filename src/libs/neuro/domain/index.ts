@@ -1,3 +1,2 @@
-export * from './dalle-prompt'
-export * from './rugpt-prompt'
-export * from './rugpt-result'
+export * from './dalle'
+export * from './rugpt'

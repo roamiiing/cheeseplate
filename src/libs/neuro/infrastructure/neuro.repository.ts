@@ -1,13 +1,20 @@
 import axios from 'axios'
 
-import { DalleDeps } from '@/libs/neuro/application'
+import { RugptDeps, DalleDeps } from '@/libs/neuro/application'
+import { createFakeHeaders } from '@/libs/shared/http'
 import { Time } from '@/libs/shared/units'
 import { Logger } from '@/libs/shared/workflow'
 
 const DALLE_TIMEOUT = Time(1, 'm')
 
+const BALABOBA_TIMEOUT = Time(1, 'm')
+
 type DalleMiniResponse = {
   images?: string[] // base64 strings
+}
+
+type RugptResponse = {
+  predictions?: string
 }
 
 export type NeuroRepositoryDeps = {
@@ -46,5 +53,43 @@ export const requestDalleMiniImages = ({
     scopedLogger.info('Received Dalle Mini images')
 
     return data.images.map(v => Buffer.from(v, 'base64'))
+  }
+}
+
+export class InvalidRugptResponseError extends Error {
+  constructor(private _response: unknown) {
+    super('Invalid Rugpt response')
+  }
+}
+
+export const requestRugptText = ({
+  logger,
+}: NeuroRepositoryDeps): RugptDeps['requestRugptText'] => {
+  const scopedLogger = logger.withScope('requestRugptText')
+
+  return async prompt => {
+    scopedLogger.info('Requesting Rugpt text')
+
+    const { data } = await axios.post<RugptResponse>(
+      'https://api.aicloud.sbercloud.ru/public/v1/public_inference/gpt3/predict',
+      {
+        text: prompt,
+      },
+      {
+        timeout: BALABOBA_TIMEOUT.in('ms'),
+        headers: createFakeHeaders({
+          host: 'api.aicloud.sbercloud.ru',
+          origin: 'https://russiannlp.github.io',
+        }),
+      },
+    )
+
+    if (!data.predictions || typeof data.predictions !== 'string') {
+      throw new InvalidRugptResponseError(data)
+    }
+
+    scopedLogger.info('Received Rugpt text')
+
+    return data.predictions
   }
 }

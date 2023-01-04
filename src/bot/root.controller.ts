@@ -2,13 +2,13 @@ import { autoRetry } from '@grammyjs/auto-retry'
 import { limit } from '@grammyjs/ratelimiter'
 import { run, RunnerHandle } from '@grammyjs/runner'
 import { apiThrottler } from '@grammyjs/transformer-throttler'
+import { UserFromGetMe } from '@grammyjs/types'
 import { asClass, asValue, createContainer } from 'awilix'
 import { Bot, BotError } from 'grammy'
 
 import { NeuroController } from '@/libs/neuro/presentation'
 import { ConsolaLogger } from '@/libs/shared/loggers'
 import { Controller, Logger, ScopedLogger } from '@/libs/shared/workflow'
-import { UserFromGetMe } from '@grammyjs/types'
 
 export type RootContainerItems = {
   bot: Bot
