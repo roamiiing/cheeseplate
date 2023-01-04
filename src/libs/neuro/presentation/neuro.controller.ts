@@ -16,7 +16,7 @@ export type NeuroControllerDeps = {
 
 export class NeuroController implements Controller {
   private readonly _container = createNeuroContainer({
-    maxConcurrentDalleRequests: 2,
+    maxConcurrentDalleRequests: 10,
   })
 
   constructor(private readonly _deps: NeuroControllerDeps) {}
