@@ -7,11 +7,12 @@ import { createNeuroContainer } from '@/libs/neuro/infrastructure'
 import { joinImages } from '@/libs/shared/images'
 import { stripFirst } from '@/libs/shared/strings'
 import { mapZodError } from '@/libs/shared/validation'
-import { Controller } from '@/libs/shared/workflow'
+import { Controller, Logger, ScopedLogger } from '@/libs/shared/workflow'
 
 export type NeuroControllerDeps = {
   bot: Bot
   dalleUseCase: DalleUseCase
+  logger: Logger
 }
 
 export class NeuroController implements Controller {
@@ -27,6 +28,8 @@ export class NeuroController implements Controller {
 
   private _registerDalleHandler(): void {
     this._deps.bot.command('dalle', async ctx => {
+      this._logger.info('dalle command')
+
       const useCase = this._container.cradle.dalleUseCase
 
       const prompt = stripFirst(ctx.message?.text ?? '')
@@ -52,6 +55,8 @@ export class NeuroController implements Controller {
             }
 
             case DalleStatus.UnderLoad: {
+              this._logger.info('service is under load')
+
               await ctx.reply('Dalle is under load, try again later', {
                 reply_to_message_id: ctx.message?.message_id,
               })
@@ -72,7 +77,7 @@ export class NeuroController implements Controller {
         }
 
         if (messageToDelete) {
-          ctx.api.deleteMessage(
+          await ctx.api.deleteMessage(
             messageToDelete.chat.id,
             messageToDelete.message_id,
           )
@@ -84,5 +89,9 @@ export class NeuroController implements Controller {
         throw error
       }
     })
+  }
+
+  private get _logger(): ScopedLogger {
+    return this._deps.logger.withScope('NeuroController')
   }
 }
