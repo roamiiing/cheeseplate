@@ -7,6 +7,7 @@ import { information, time } from '@/libs/shared/math'
 import { Queue } from '@/libs/shared/queue'
 import { wrapUseCase } from '@/libs/shared/telegraf'
 import { PriorityBuilder } from '@/libs/shared/workflow'
+import { Cache } from '@/libs/shared/workflow'
 
 import { createGeneralContainer } from './general.container'
 
@@ -14,10 +15,11 @@ export type GeneralControllerDeps = {
   bot: Telegraf
   botBuilder: PriorityBuilder
   queue: Queue
+  cache: Cache
 }
 
 export const configureGeneral =
-  ({ bot, botBuilder, queue }: GeneralControllerDeps) =>
+  ({ bot, botBuilder, queue, cache }: GeneralControllerDeps) =>
   () => {
     const generalContainer = createGeneralContainer()
 
@@ -45,6 +47,8 @@ export const configureGeneral =
               uptime: time(Math.floor(process.uptime()), 's'),
             }
 
+            const cacheInfo = await cache.getDebugInfo()
+
             await wrapUseCase(
               ctx,
               generalContainer.cradle.debugUseCase,
@@ -52,6 +56,7 @@ export const configureGeneral =
               {
                 chatInfo,
                 serverInfo,
+                cacheInfo,
               },
             )
           }),

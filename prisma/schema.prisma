@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("PG_PRISMA_DATABASE_URL")
+  provider = "cockroachdb"
+  url      = env("COCKROACH_PRISMA_DATABASE_URL")
 }
 
 model Chat {
@@ -14,7 +14,7 @@ model Chat {
 }
 
 model Tag {
-  id             Int    @id @default(autoincrement())
+  id             Int    @id @default(sequence())
   tag            String
   chatTelegramId BigInt
   chat           Chat   @relation(fields: [chatTelegramId], references: [telegramId])
@@ -24,7 +24,7 @@ model Tag {
 }
 
 model User {
-  id               Int     @id @default(autoincrement())
+  id               Int     @id @default(sequence())
   telegramId       BigInt
   displayName      String
   telegramUsername String?
@@ -43,7 +43,7 @@ model User {
 }
 
 model Counters {
-  id Int @id @default(autoincrement())
+  id Int @id @default(sequence())
 
   telegramUserId BigInt
   telegramChatId BigInt
@@ -51,6 +51,7 @@ model Counters {
   user User @relation(fields: [telegramChatId, telegramUserId], references: [chatTelegramId, telegramId])
 
   isItHypeCounter Int @default(0)
+  @@unique([telegramChatId, telegramUserId])
 }
 
 enum Achievement {
@@ -59,7 +60,7 @@ enum Achievement {
 }
 
 model Achievements {
-  id Int @id @default(autoincrement())
+  id Int @id @default(sequence())
 
   telegramUserId BigInt
   telegramChatId BigInt

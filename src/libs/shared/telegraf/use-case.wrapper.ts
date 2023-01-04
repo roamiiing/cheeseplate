@@ -68,16 +68,17 @@ export const processResult = (
             )
         }
 
-        if (cleanupMessages) {
-          sentMessages.forEach(message => {
-            setTimeout(() => {
-              queue.enqueue(message.chat.id, async () => {
-                ctx.deleteMessage(message.message_id)
-                ctx.deleteMessage(ctx.message?.message_id)
-              })
-            }, time(1, 'm').in('ms'))
-          })
-        }
+        // TODO: serverless environments
+        // if (cleanupMessages) {
+        //   sentMessages.forEach(message => {
+        //     setTimeout(() => {
+        //       queue.enqueue(message.chat.id, async () => {
+        //         ctx.deleteMessage(message.message_id)
+        //         ctx.deleteMessage(ctx.message?.message_id)
+        //       })
+        //     }, time(1, 'm').in('ms'))
+        //   })
+        // }
       } catch (e) {
         const retryAfter = (e as TelegramError)?.response?.parameters
           ?.retry_after

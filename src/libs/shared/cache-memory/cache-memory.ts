@@ -2,7 +2,7 @@ import { defu } from 'defu'
 import bjson from 'json-bigint'
 
 import { Time } from '@/libs/shared/units'
-import { Cache, CacheOptions } from '@/libs/shared/workflow'
+import { Cache, CacheDebugInfo, CacheOptions } from '@/libs/shared/workflow'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
@@ -55,6 +55,12 @@ export class CacheMemory implements Cache {
       if (fnName === fnNameFromKey) {
         this._map.delete(key)
       }
+    }
+  }
+
+  async getDebugInfo(): Promise<CacheDebugInfo> {
+    return {
+      entries: this._map.size,
     }
   }
 

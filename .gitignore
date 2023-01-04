@@ -10,3 +10,5 @@ docker/localvolumes
 env
 
 dist
+
+.DS_Store

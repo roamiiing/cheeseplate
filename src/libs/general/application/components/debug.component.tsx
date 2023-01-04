@@ -7,9 +7,14 @@ type Rec = Record<string, string | number>
 export type DebugProps = {
   chatInfo: Rec
   serverInfo: Rec
+  cacheInfo: Rec
 }
 
-export const Debug: React.FC<DebugProps> = ({ chatInfo, serverInfo }) => (
+export const Debug: React.FC<DebugProps> = ({
+  chatInfo,
+  serverInfo,
+  cacheInfo,
+}) => (
   <>
     <b>🤐 Сверхсекретная информация 🤫</b>
 
@@ -27,6 +32,16 @@ export const Debug: React.FC<DebugProps> = ({ chatInfo, serverInfo }) => (
 
     <b>Сервер:</b>
     {Object.entries(serverInfo).map(([key, val], i) => (
+      <React.Fragment key={i}>
+        <Br />
+        <b>{key}</b>: {val}
+      </React.Fragment>
+    ))}
+
+    <Br lines={2} />
+
+    <b>Кэш:</b>
+    {Object.entries(cacheInfo).map(([key, val], i) => (
       <React.Fragment key={i}>
         <Br />
         <b>{key}</b>: {val}

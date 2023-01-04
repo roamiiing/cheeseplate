@@ -33,11 +33,6 @@ type ConfigureModulesDeps = {
   configureNeuro: ReturnType<typeof configureNeuro>
 }
 
-const {
-  // include all features by default
-  FEATURES_MASK = '63',
-} = process.env
-
 const configureModules =
   ({
     configureChats,
@@ -47,11 +42,17 @@ const configureModules =
     configureRandom,
     configureNeuro,
   }: ConfigureModulesDeps) =>
-  () => {
+  (
+    featuresMask = Module.General |
+      Module.Users |
+      Module.Tags |
+      Module.Neuro |
+      Module.Random,
+  ) => {
     // This one is always enabled for checking if chat is whitelisted
     configureChats()
 
-    pipe(FEATURES_MASK, parseInt, getModulesFromMask, modules =>
+    pipe(featuresMask, getModulesFromMask, modules =>
       modules.forEach(module =>
         ({
           [Module.General]: configureGeneral,
@@ -64,33 +65,33 @@ const configureModules =
     )
   }
 
-export const appContainer = createContainer<
-  {
-    bot: Telegraf
-    botBuilder: PriorityBuilder
-    prismaClient: PrismaClient
-    cheeseBot: CheeseBot
-    queue: Queue
-    cache: Cache
-    configureModules: ReturnType<typeof configureModules>
-  } & ConfigureModulesDeps
->({
-  injectionMode: InjectionMode.PROXY,
-}).register({
-  bot: asValue(bot),
-  botBuilder: asValue(botBuilder),
-  prismaClient: asValue(prismaClient),
-  queue: asValue(new Queue()),
-  cache: asValue(new CacheMemory()),
+export const createAppContainer = () =>
+  createContainer<
+    {
+      bot: Telegraf
+      botBuilder: PriorityBuilder
+      prismaClient: PrismaClient
+      cheeseBot: CheeseBot
+      queue: Queue
+      cache: Cache
+      configureModules: ReturnType<typeof configureModules>
+    } & ConfigureModulesDeps
+  >({
+    injectionMode: InjectionMode.PROXY,
+  }).register({
+    bot: asValue(bot),
+    botBuilder: asValue(botBuilder),
+    prismaClient: asValue(prismaClient),
+    cache: asValue(new CacheMemory()),
 
-  cheeseBot: asClass(TelegrafCheeseBot),
+    cheeseBot: asClass(TelegrafCheeseBot),
 
-  configureChats: asFunction(configureChats),
-  configureGeneral: asFunction(configureGeneral),
-  configureUsers: asFunction(configureUsers),
-  configureTags: asFunction(configureTags),
-  configureRandom: asFunction(configureRandom),
-  configureNeuro: asFunction(configureNeuro),
+    configureChats: asFunction(configureChats),
+    configureGeneral: asFunction(configureGeneral),
+    configureUsers: asFunction(configureUsers),
+    configureTags: asFunction(configureTags),
+    configureRandom: asFunction(configureRandom),
+    configureNeuro: asFunction(configureNeuro),
 
-  configureModules: asFunction(configureModules),
-})
+    configureModules: asFunction(configureModules),
+  })
