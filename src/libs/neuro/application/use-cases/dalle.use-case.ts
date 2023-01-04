@@ -1,52 +1,46 @@
 import { DallePrompt } from '@/libs/neuro/domain'
-import { Time } from '@/libs/shared/units'
-import { mapZodError } from '@/libs/shared/validation'
-import { GeneratorUseCase, Media } from '@/libs/shared/workflow'
+import { Semaphore } from '@/libs/shared/workflow'
 
-import { problemsDalleReplica, waitDalleReplica } from '../replicas'
-
-export const DALLE_COMMAND = '/dalle'
-export const DALLE_TIMEOUT = Time(4, 'm')
+export type ImageBuffer = Buffer
 
 export type DalleDeps = {
-  requestDalleMiniImages: (prompt: string) => Promise<Media[] | null>
+  requestDalleMiniImages: (prompt: string) => Promise<ImageBuffer[]>
+  dalleSemaphore: Semaphore
 }
 
 export type DeleteTagInput = {
   prompt: string
 }
 
+export const enum DalleStatus {
+  Wait,
+  UnderLoad,
+  Images,
+}
+
+export type DalleOutput =
+  | { status: DalleStatus.Wait }
+  | { status: DalleStatus.UnderLoad }
+  | { status: DalleStatus.Images; images: readonly ImageBuffer[] }
+
+export type DalleUseCase = (
+  prompt: DallePrompt,
+) => AsyncGenerator<DalleOutput, void, void>
+
 export const dalleUseCase = ({
   requestDalleMiniImages,
-}: DalleDeps): GeneratorUseCase<DeleteTagInput> =>
-  async function* dalleUseCase({ input: { prompt } }) {
-    const validated = await DallePrompt.safeParseAsync(prompt)
+  dalleSemaphore,
+}: DalleDeps): DalleUseCase =>
+  async function* dalleUseCase(prompt: DallePrompt) {
+    const release = dalleSemaphore.acquire()
 
-    if (!validated.success) {
-      return yield {
-        message: mapZodError(validated.error),
-      }
+    if (!release) {
+      return yield { status: DalleStatus.UnderLoad }
     }
 
-    yield {
-      message: waitDalleReplica({ prompt: validated.data }),
-      options: {
-        cleanupMessages: false,
-      },
-    }
+    yield { status: DalleStatus.Wait }
 
-    const result = await requestDalleMiniImages(validated.data)
+    const images = await requestDalleMiniImages(prompt).finally(release)
 
-    if (!result) {
-      return yield {
-        message: problemsDalleReplica(),
-      }
-    }
-
-    yield {
-      media: result,
-      options: {
-        cleanupMessages: false,
-      },
-    }
+    yield { status: DalleStatus.Images, images }
   }

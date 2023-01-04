@@ -1,1 +1,1 @@
-export * from './neuro.controller'
+export * from './neuro.container'

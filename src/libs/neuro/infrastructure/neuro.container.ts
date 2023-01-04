@@ -1,27 +1,32 @@
 import { asFunction, createContainer, InjectionMode } from 'awilix'
 
-import {
-  DalleDeps,
-  dalleUseCase,
-  RuGptDeps,
-  ruGptUseCase,
-} from '@/libs/neuro/application'
+import { DalleDeps, DalleUseCase, dalleUseCase } from '@/libs/neuro/application'
+import { Semaphore } from '@/libs/shared/workflow'
 
-import { requestDalleMiniImages, requestRuGptText } from './neuro.data'
+import { requestDalleMiniImages } from './neuro.repository'
 
-export const createNeuroContainer = () => {
+export type NeuroContainerItems = DalleDeps & {
+  dalleUseCase: DalleUseCase
+}
+
+export type NeuroContainerConfig = {
+  maxConcurrentDalleRequests: number
+}
+
+export const createNeuroContainer = ({
+  maxConcurrentDalleRequests,
+}: NeuroContainerConfig) => {
   return createContainer<
-    DalleDeps &
-      RuGptDeps & {
-        dalleUseCase: ReturnType<typeof dalleUseCase>
-        ruGptUseCase: ReturnType<typeof ruGptUseCase>
-      }
+    DalleDeps & {
+      dalleUseCase: DalleUseCase
+    }
   >({
     injectionMode: InjectionMode.PROXY,
   }).register({
-    requestDalleMiniImages: asFunction(requestDalleMiniImages),
-    requestRuGptText: asFunction(requestRuGptText),
-    dalleUseCase: asFunction(dalleUseCase),
-    ruGptUseCase: asFunction(ruGptUseCase),
+    requestDalleMiniImages: asFunction(requestDalleMiniImages).singleton(),
+    dalleUseCase: asFunction(dalleUseCase).singleton(),
+    dalleSemaphore: asFunction(
+      () => new Semaphore(maxConcurrentDalleRequests),
+    ).singleton(),
   })
 }

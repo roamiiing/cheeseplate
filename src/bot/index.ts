@@ -3,12 +3,9 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-import { Bot } from 'grammy'
+import { RootController } from './root.controller'
 
-const bot = new Bot(process.env.TG_BOT_TOKEN ?? '')
+const controller = new RootController()
 
-bot.command('start', ctx => ctx.reply('Hello World!'))
-
-bot.start({
-  drop_pending_updates: true,
-})
+controller.register()
+controller.run()

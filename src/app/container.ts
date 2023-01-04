@@ -11,7 +11,6 @@ import { Telegraf } from 'telegraf'
 
 import { configureChats } from '@/libs/chats/infrastructure'
 import { configureGeneral } from '@/libs/general/infrastructure'
-import { configureNeuro } from '@/libs/neuro/infrastructure'
 import { configureRandom } from '@/libs/random/infrastructure'
 import { CheeseBot } from '@/libs/shared/bot'
 import { CacheMemory } from '@/libs/shared/cache-memory'
@@ -30,7 +29,6 @@ type ConfigureModulesDeps = {
   configureUsers: ReturnType<typeof configureUsers>
   configureTags: ReturnType<typeof configureTags>
   configureRandom: ReturnType<typeof configureRandom>
-  configureNeuro: ReturnType<typeof configureNeuro>
 }
 
 const configureModules =
@@ -40,14 +38,9 @@ const configureModules =
     configureUsers,
     configureTags,
     configureRandom,
-    configureNeuro,
   }: ConfigureModulesDeps) =>
   (
-    featuresMask = Module.General |
-      Module.Users |
-      Module.Tags |
-      Module.Neuro |
-      Module.Random,
+    featuresMask = Module.General | Module.Users | Module.Tags | Module.Random,
   ) => {
     // This one is always enabled for checking if chat is whitelisted
     configureChats()
@@ -59,7 +52,6 @@ const configureModules =
           [Module.Users]: configureUsers,
           [Module.Tags]: configureTags,
           [Module.Random]: configureRandom,
-          [Module.Neuro]: configureNeuro,
         }[module]()),
       ),
     )
@@ -91,7 +83,6 @@ export const createAppContainer = () =>
     configureUsers: asFunction(configureUsers),
     configureTags: asFunction(configureTags),
     configureRandom: asFunction(configureRandom),
-    configureNeuro: asFunction(configureNeuro),
 
     configureModules: asFunction(configureModules),
   })

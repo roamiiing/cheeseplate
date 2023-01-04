@@ -29,6 +29,7 @@
     "@types/node": "^18.7.14",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.3",
+    "@types/sharp": "^0.31.1",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.10.2",
     "@vercel/node": "^2.8.3",
@@ -53,6 +54,10 @@
     "zx": "^7.1.1"
   },
   "dependencies": {
+    "@grammyjs/auto-retry": "^1.1.1",
+    "@grammyjs/ratelimiter": "^1.1.6",
+    "@grammyjs/runner": "^1.0.4",
+    "@grammyjs/transformer-throttler": "^1.2.1",
     "@prisma/client": "^4.4.0",
     "consola": "^2.15.3",
     "defu": "^6.1.0",
@@ -64,6 +69,7 @@
     "metriqa": "^0.1.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "sharp": "^0.31.3",
     "source-map-support": "^0.5.21",
     "telegraf": "^4.8.1",
     "zod": "^3.14.2"
