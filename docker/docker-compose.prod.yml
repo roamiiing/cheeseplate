@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  neurobot:
+    container_name: neurobot
+    hostname: neurobot
+    image: ghcr.io/roamiiing/cheeseplate:latest
+    restart: on-failure
+    env_file: .env

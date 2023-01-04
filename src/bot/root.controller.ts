@@ -51,6 +51,9 @@ export class RootController implements Controller {
       }),
     )
 
+    this._bot.api.deleteWebhook({
+      drop_pending_updates: true,
+    })
     this._bot.api.config.use(apiThrottler())
     this._bot.api.config.use(
       autoRetry({
