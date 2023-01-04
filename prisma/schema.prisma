@@ -51,6 +51,7 @@ model Counters {
   user User @relation(fields: [telegramChatId, telegramUserId], references: [chatTelegramId, telegramId])
 
   isItHypeCounter Int @default(0)
+
   @@unique([telegramChatId, telegramUserId])
 }
 

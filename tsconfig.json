@@ -9,6 +9,7 @@
     "resolveJsonModule": true,
     "types": ["vite/client", "node"],
     "jsx": "react",
+    "skipLibCheck": true,
     "paths": {
       "@/*": ["src/*"]
     },

@@ -14,6 +14,7 @@
     "tsc": "tsc",
     "build:serverless": "SERVERLESS_BUILD=true tsup",
     "build:standalone": "STANDALONE_BUILD=true tsup",
+    "build:bot": "BOT_BUILD=true tsup",
     "vercel-build": "npm run build:serverless && npm run prisma migrate deploy",
     "botfather-commands": "zx ./scripts/botfather-commands.mjs",
     "set-webhook": "node ./scripts/set-telegram-webhook.js",
