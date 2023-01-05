@@ -1,26 +1,25 @@
-import { Message } from '@grammyjs/types'
-import { Bot, InputFile } from 'grammy'
+import { AwilixContainer } from 'awilix'
+import { Bot } from 'grammy'
 
+import { DalleUseCase } from '@/libs/neuro/application'
 import {
-  RugptStatus,
-  DalleStatus,
-  DalleUseCase,
-} from '@/libs/neuro/application'
-import { RugptPrompt, DallePrompt } from '@/libs/neuro/domain'
-import { createNeuroContainer } from '@/libs/neuro/infrastructure'
-import { joinImages } from '@/libs/shared/images'
-import { stripFirst } from '@/libs/shared/strings'
-import { mapZodError } from '@/libs/shared/validation'
-import { Controller, Logger, ScopedLogger } from '@/libs/shared/workflow'
+  createNeuroContainer,
+  NeuroContainerItems,
+} from '@/libs/neuro/infrastructure'
+import { Controller, Logger } from '@/libs/shared/workflow'
+
+import { DalleHandler, RugptHandler } from './handlers'
 
 export type NeuroControllerDeps = {
-  bot: Bot
   dalleUseCase: DalleUseCase
   logger: Logger
+  bot: Bot
 }
 
 export class NeuroController implements Controller {
-  private readonly _container: ReturnType<typeof createNeuroContainer>
+  private readonly _container: AwilixContainer<NeuroContainerItems>
+  private readonly _dalleHandler: DalleHandler
+  private readonly _rugptHandler: RugptHandler
 
   constructor(private readonly _deps: NeuroControllerDeps) {
     this._container = createNeuroContainer({
@@ -31,149 +30,13 @@ export class NeuroController implements Controller {
         logger: this._deps.logger,
       },
     })
+
+    this._dalleHandler = new DalleHandler(this._container.cradle)
+    this._rugptHandler = new RugptHandler(this._container.cradle)
   }
 
   public register(): void {
-    this._registerDalleHandler()
-    this._registerRugptHandler()
-  }
-
-  private _registerDalleHandler(): void {
-    this._deps.bot.command('dalle', async ctx => {
-      this._logger.info('dalle command')
-
-      const useCase = this._container.cradle.dalleUseCase
-
-      const prompt = stripFirst(ctx.message?.text ?? '')
-      const validatedPrompt = await DallePrompt.safeParseAsync(prompt)
-
-      if (!validatedPrompt.success) {
-        return await ctx.reply(mapZodError(validatedPrompt.error), {
-          reply_to_message_id: ctx.message?.message_id,
-        })
-      }
-
-      let messageToDelete: Message | null = null
-
-      try {
-        for await (const output of useCase(validatedPrompt.data)) {
-          switch (output.status) {
-            case DalleStatus.Wait: {
-              messageToDelete = await ctx.reply('Wait a second...', {
-                reply_to_message_id: ctx.message?.message_id,
-                disable_notification: true,
-              })
-
-              break
-            }
-
-            case DalleStatus.UnderLoad: {
-              this._logger.info('service is under load')
-
-              await ctx.reply('Dalle is under load, try again later', {
-                reply_to_message_id: ctx.message?.message_id,
-                disable_notification: true,
-              })
-
-              break
-            }
-
-            case DalleStatus.Images: {
-              const joined = await joinImages(output.images)
-
-              await ctx.replyWithPhoto(new InputFile(joined), {
-                reply_to_message_id: ctx.message?.message_id,
-              })
-
-              break
-            }
-          }
-        }
-
-        if (messageToDelete) {
-          await ctx.api.deleteMessage(
-            messageToDelete.chat.id,
-            messageToDelete.message_id,
-          )
-        }
-      } catch (error) {
-        await ctx.reply('Something went wrong', {
-          reply_to_message_id: ctx.message?.message_id,
-          disable_notification: true,
-        })
-        throw error
-      }
-    })
-  }
-
-  private _registerRugptHandler(): void {
-    this._deps.bot.command('rugpt', async ctx => {
-      this._logger.info('rugpt command')
-
-      const useCase = this._container.cradle.rugptUseCase
-
-      const prompt = stripFirst(ctx.message?.text ?? '')
-
-      const validatedPrompt = await RugptPrompt.safeParseAsync(prompt)
-
-      if (!validatedPrompt.success) {
-        return await ctx.reply(mapZodError(validatedPrompt.error), {
-          reply_to_message_id: ctx.message?.message_id,
-        })
-      }
-
-      let messageToDelete: Message | null = null
-
-      try {
-        for await (const output of useCase(validatedPrompt.data)) {
-          switch (output.status) {
-            case RugptStatus.Wait: {
-              messageToDelete = await ctx.reply('Wait a second...', {
-                reply_to_message_id: ctx.message?.message_id,
-                disable_notification: true,
-              })
-
-              break
-            }
-
-            case RugptStatus.UnderLoad: {
-              this._logger.info('service is under load')
-
-              await ctx.reply('Rugpt is under load, try again later', {
-                reply_to_message_id: ctx.message?.message_id,
-                disable_notification: true,
-              })
-
-              break
-            }
-
-            case RugptStatus.Text: {
-              await ctx.reply(output.text, {
-                reply_to_message_id: ctx.message?.message_id,
-              })
-
-              break
-            }
-          }
-        }
-
-        if (messageToDelete) {
-          await ctx.api.deleteMessage(
-            messageToDelete.chat.id,
-            messageToDelete.message_id,
-          )
-        }
-      } catch (error) {
-        await ctx.reply('Something went wrong', {
-          reply_to_message_id: ctx.message?.message_id,
-          disable_notification: true,
-        })
-        throw error
-      }
-    })
-  }
-
-  private get _logger(): ScopedLogger {
-    return this._deps.logger.withScope('NeuroController')
+    this._deps.bot.use(this._dalleHandler.router)
+    this._deps.bot.use(this._rugptHandler.router)
   }
 }

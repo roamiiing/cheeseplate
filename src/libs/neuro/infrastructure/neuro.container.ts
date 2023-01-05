@@ -11,14 +11,19 @@ import {
 import { Logger, Semaphore } from '@/libs/shared/workflow'
 
 import {
-  NeuroRepositoryDeps,
+  DalleRepositoryDeps,
+  RugptRepositoryDeps,
   requestRugptText,
   requestDalleMiniImages,
-} from './neuro.repository'
+} from './repositories'
 
-export type NeuroContainerItems = DalleDeps & {
-  dalleUseCase: DalleUseCase
-}
+export type NeuroContainerItems = DalleDeps &
+  RugptDeps &
+  DalleRepositoryDeps &
+  RugptRepositoryDeps & {
+    dalleUseCase: DalleUseCase
+    rugptUseCase: RugptUseCase
+  }
 
 export type NeuroContainerConfig = {
   maxConcurrentDalleRequests: number
@@ -35,21 +40,16 @@ export const createNeuroContainer = ({
 
   deps: { logger },
 }: NeuroContainerConfig) => {
-  return createContainer<
-    DalleDeps &
-      RugptDeps &
-      NeuroRepositoryDeps & {
-        dalleUseCase: DalleUseCase
-        rugptUseCase: RugptUseCase
-      }
-  >({
+  return createContainer<NeuroContainerItems>({
     injectionMode: InjectionMode.PROXY,
   }).register({
     requestDalleMiniImages: asFunction(requestDalleMiniImages).singleton(),
     requestRugptText: asFunction(requestRugptText).singleton(),
     dalleUseCase: asFunction(dalleUseCase).singleton(),
     rugptUseCase: asFunction(rugptUseCase).singleton(),
-    dalleSemaphore: asFunction(() => new Semaphore(maxConcurrentDalleRequests)),
+    dalleSemaphore: asFunction(
+      () => new Semaphore(maxConcurrentDalleRequests),
+    ).singleton(),
     rugptSemaphore: asFunction(
       () => new Semaphore(maxConcurrentRugptRequests),
     ).singleton(),
