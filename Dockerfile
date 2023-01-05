@@ -14,4 +14,4 @@ RUN npm prune --production
 
 ENV NODE_ENV=production
 
-CMD ["node", "./dist/bot/index.js"]
+CMD ["/bin/sh", "-c" "npx prisma migrate --deploy; node ./dist/bot/index.js"]

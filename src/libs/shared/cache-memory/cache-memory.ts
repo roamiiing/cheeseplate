@@ -2,12 +2,19 @@ import { defu } from 'defu'
 import bjson from 'json-bigint'
 
 import { Time } from '@/libs/shared/units'
-import { Cache, CacheDebugInfo, CacheOptions } from '@/libs/shared/workflow'
-
-const isDev = process.env.NODE_ENV !== 'production'
+import {
+  Cache,
+  CacheDebugInfo,
+  CacheOptions,
+  Logger,
+  ScopedLogger,
+} from '@/libs/shared/workflow'
 
 export class CacheMemory implements Cache {
-  constructor(options?: Partial<CacheOptions>) {
+  constructor(
+    options?: Partial<CacheOptions>,
+    private readonly _globalLogger?: Logger,
+  ) {
     this._options = defu(options, {
       ttl: Time(5, 'h'),
     })
@@ -24,16 +31,12 @@ export class CacheMemory implements Cache {
       const key = CacheMemory._getMapKey(fnName, arg)
 
       if (this._map.has(key)) {
-        if (isDev) {
-          console.log('Taken from cache:', key)
-        }
+        this._logger?.info('Taken from cache:', key)
 
         return this._map.get(key) as R
       }
 
-      if (isDev) {
-        console.log('Cache miss:', key)
-      }
+      this._logger?.info('Cache miss:', key)
 
       const result = await fn(arg)
       this._map.set(key, result)
@@ -76,5 +79,9 @@ export class CacheMemory implements Cache {
 
   private static _getFnNameFromKey(key: string): string | undefined {
     return key.split(CacheMemory._delimeter).at(0)
+  }
+
+  private get _logger(): ScopedLogger | undefined {
+    return this._globalLogger?.withScope('CacheMemory')
   }
 }

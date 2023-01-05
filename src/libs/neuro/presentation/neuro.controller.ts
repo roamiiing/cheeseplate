@@ -1,7 +1,6 @@
 import { AwilixContainer } from 'awilix'
 import { Bot } from 'grammy'
 
-import { DalleUseCase } from '@/libs/neuro/application'
 import {
   createNeuroContainer,
   NeuroContainerItems,
@@ -11,7 +10,6 @@ import { Controller, Logger } from '@/libs/shared/workflow'
 import { DalleHandler, RugptHandler } from './handlers'
 
 export type NeuroControllerDeps = {
-  dalleUseCase: DalleUseCase
   logger: Logger
   bot: Bot
 }

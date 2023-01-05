@@ -3,18 +3,21 @@ import { limit } from '@grammyjs/ratelimiter'
 import { run, RunnerHandle } from '@grammyjs/runner'
 import { apiThrottler } from '@grammyjs/transformer-throttler'
 import { UserFromGetMe } from '@grammyjs/types'
+import { PrismaClient } from '@prisma/client'
 import { asClass, asValue, createContainer } from 'awilix'
 import { Bot, BotError } from 'grammy'
 
-import { NeuroController } from '@/libs/neuro/presentation'
+import { ChatsController, ChatsControllerDeps } from '@/libs/chats/presentation'
+import { NeuroController, NeuroControllerDeps } from '@/libs/neuro/presentation'
+import { CacheMemory } from '@/libs/shared/cache-memory'
 import { ConsolaLogger } from '@/libs/shared/loggers'
-import { Controller, Logger, ScopedLogger } from '@/libs/shared/workflow'
+import { Controller, ScopedLogger } from '@/libs/shared/workflow'
 
 export type RootContainerItems = {
-  bot: Bot
   neuroController: Controller
-  logger: Logger
-}
+  chatsController: Controller
+} & NeuroControllerDeps &
+  ChatsControllerDeps
 
 export class RootController implements Controller {
   private readonly _container = createContainer<RootContainerItems>()
@@ -29,6 +32,8 @@ export class RootController implements Controller {
   public register(): void {
     this._scaffoldContainer()
     this._scaffoldBot()
+
+    this._container.cradle.chatsController.register()
     this._container.cradle.neuroController.register()
   }
 
@@ -57,8 +62,22 @@ export class RootController implements Controller {
   private _scaffoldContainer(): void {
     this._container.register({
       bot: asValue(this._bot),
-      neuroController: asClass(NeuroController).singleton(),
+      cache: asValue(new CacheMemory({}, this._logger)),
       logger: asValue(this._logger),
+
+      prismaClient: asValue(
+        new PrismaClient({
+          log: ['query', 'info', 'warn'],
+          errorFormat: 'pretty',
+          datasources: {
+            db: {
+              url: process.env.COCKROACH_PRISMA_DATABASE_URL,
+            },
+          },
+        }),
+      ),
+      neuroController: asClass(NeuroController).singleton(),
+      chatsController: asClass(ChatsController).singleton(),
     })
   }
 
