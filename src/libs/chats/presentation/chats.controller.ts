@@ -24,14 +24,20 @@ export class ChatsController implements Controller {
       const chatId = ctx.chat?.id
 
       if (!chatId) {
-        this._logger.warn('Chat id is not defined', { update: ctx.update })
+        this._logger.warn('Chat id is not defined', {
+          update: ctx.update,
+          chat: ctx.chat,
+        })
         return
       }
 
       const isRegistered = await this._checkChatInWhiteList(chatId)
 
       if (!isRegistered) {
-        this._logger.warn('Chat is not registered', { update: ctx.update })
+        this._logger.warn('Chat is not registered', {
+          update: ctx.update,
+          chat: ctx.chat,
+        })
         return
       }
 

@@ -82,24 +82,35 @@ export class RootController implements Controller {
   }
 
   private _scaffoldBot(): void {
-    this._bot.use(
-      limit({
-        timeFrame: 2000,
-        limit: 5,
+    this._bot
+      .filter(
+        ctx =>
+          ctx.message?.text?.startsWith('/') ||
+          ctx.message?.reply_to_message?.text?.startsWith('/') ||
+          !!ctx.callbackQuery?.data ||
+          ctx.message?.entities?.some(e => e.type === 'hashtag') ||
+          false,
+      )
+      .use(
+        limit({
+          timeFrame: 2000,
+          limit: 5,
 
-        onLimitExceeded: async ctx => {
-          this._scopedLogger.warn('Limit exceeded', {
-            from: ctx.from,
-            chat: ctx.chat,
-          })
-          await ctx.reply('Slow down please')
-        },
+          onLimitExceeded: async ctx => {
+            this._scopedLogger.warn('Limit exceeded', {
+              from: ctx.from,
+              chat: ctx.chat,
+            })
+            await ctx.reply('Slow down please')
+          },
 
-        keyGenerator: ctx => {
-          return [ctx.from?.id.toString(), ctx.chat?.id.toString()].join('###')
-        },
-      }),
-    )
+          keyGenerator: ctx => {
+            return [ctx.from?.id.toString(), ctx.chat?.id.toString()].join(
+              '###',
+            )
+          },
+        }),
+      )
 
     this._bot.api.deleteWebhook({
       drop_pending_updates: true,
