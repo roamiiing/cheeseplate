@@ -24,7 +24,7 @@ export class RugptHandler {
     this._router.route('rugpt').command('rugpt', async ctx => {
       this._logger.info('rugpt command')
 
-      const useCase = this._deps.rugptUseCase
+      const { rugptUseCase: useCase, localeStore: t } = this._deps
 
       const prompt = stripFirst(ctx.message?.text ?? '')
 
@@ -42,10 +42,13 @@ export class RugptHandler {
         for await (const output of useCase(validatedPrompt.data)) {
           switch (output.status) {
             case RugptStatus.Wait: {
-              messageToDelete = await ctx.reply('Wait a second...', {
-                reply_to_message_id: ctx.message?.message_id,
-                disable_notification: true,
-              })
+              messageToDelete = await ctx.reply(
+                t.get('rugpt.wait', validatedPrompt.data),
+                {
+                  reply_to_message_id: ctx.message?.message_id,
+                  disable_notification: true,
+                },
+              )
 
               break
             }
@@ -53,7 +56,7 @@ export class RugptHandler {
             case RugptStatus.UnderLoad: {
               this._logger.info('service is under load')
 
-              await ctx.reply('Rugpt is under load, try again later', {
+              await ctx.reply(t.get('rugpt.underLoad'), {
                 reply_to_message_id: ctx.message?.message_id,
                 disable_notification: true,
               })
@@ -78,7 +81,7 @@ export class RugptHandler {
           )
         }
       } catch (error) {
-        await ctx.reply('Something went wrong', {
+        await ctx.reply(t.get('rugpt.error'), {
           reply_to_message_id: ctx.message?.message_id,
           disable_notification: true,
         })

@@ -25,7 +25,7 @@ export class DalleHandler {
     this._router.route('dalle').command('dalle', async ctx => {
       this._logger.info('dalle command')
 
-      const useCase = this._deps.dalleUseCase
+      const { dalleUseCase: useCase, localeStore: t } = this._deps
 
       const prompt = stripFirst(ctx.message?.text ?? '')
       const validatedPrompt = await DallePrompt.safeParseAsync(prompt)
@@ -42,10 +42,14 @@ export class DalleHandler {
         for await (const output of useCase(validatedPrompt.data)) {
           switch (output.status) {
             case DalleStatus.Wait: {
-              messageToDelete = await ctx.reply('Wait a second...', {
-                reply_to_message_id: ctx.message?.message_id,
-                disable_notification: true,
-              })
+              messageToDelete = await ctx.reply(
+                t.get('dalle.wait', validatedPrompt.data),
+                {
+                  reply_to_message_id: ctx.message?.message_id,
+                  disable_notification: true,
+                  parse_mode: 'HTML',
+                },
+              )
 
               break
             }
@@ -53,7 +57,7 @@ export class DalleHandler {
             case DalleStatus.UnderLoad: {
               this._logger.info('service is under load')
 
-              await ctx.reply('Dalle is under load, try again later', {
+              await ctx.reply(t.get('dalle.underLoad'), {
                 reply_to_message_id: ctx.message?.message_id,
                 disable_notification: true,
               })
@@ -80,7 +84,7 @@ export class DalleHandler {
           )
         }
       } catch (error) {
-        await ctx.reply('Something went wrong', {
+        await ctx.reply(t.get('dalle.error'), {
           reply_to_message_id: ctx.message?.message_id,
           disable_notification: true,
         })
@@ -90,6 +94,6 @@ export class DalleHandler {
   }
 
   private get _logger(): ScopedLogger {
-    return this._deps.logger.withScope('rugpt')
+    return this._deps.logger.withScope('dalle')
   }
 }

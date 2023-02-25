@@ -2,6 +2,8 @@ import { UseCaseContext } from './context'
 import { UseCaseResult } from './use-case'
 
 /**
+ * @deprecated
+ *
  * Now it can only receive input once. Refactor this
  * to accept input via some magic `request()` function like following:
  *

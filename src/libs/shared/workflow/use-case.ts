@@ -23,6 +23,9 @@ export type UseCaseResult = (
   options?: UseCaseResultOptions
 }
 
+/**
+ * @deprecated
+ */
 export type UseCase<Input> = (
   ctx: UseCaseContext<Input>,
 ) => Promise<UseCaseResult | undefined | null | void | never>

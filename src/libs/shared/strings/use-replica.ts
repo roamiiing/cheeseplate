@@ -1,4 +1,4 @@
-import { escapeHtml } from './escape-html'
+import { escapeHtml } from './escape'
 
 type ReplicaOptions<Placeholder extends string> = {
   replica: string

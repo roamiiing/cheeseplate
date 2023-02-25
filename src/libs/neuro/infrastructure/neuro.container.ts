@@ -8,6 +8,7 @@ import {
   DalleUseCase,
   dalleUseCase,
 } from '@/libs/neuro/application'
+import { LocaleStore } from '@/libs/shared/intl'
 import { Logger, Semaphore } from '@/libs/shared/workflow'
 
 import {
@@ -23,6 +24,7 @@ export type NeuroContainerItems = DalleDeps &
   RugptRepositoryDeps & {
     dalleUseCase: DalleUseCase
     rugptUseCase: RugptUseCase
+    localeStore: LocaleStore
   }
 
 export type NeuroContainerConfig = {
@@ -31,6 +33,7 @@ export type NeuroContainerConfig = {
 
   deps: {
     logger: Logger
+    localeStore: LocaleStore
   }
 }
 
@@ -38,7 +41,7 @@ export const createNeuroContainer = ({
   maxConcurrentDalleRequests,
   maxConcurrentRugptRequests,
 
-  deps: { logger },
+  deps: { logger, localeStore },
 }: NeuroContainerConfig) => {
   return createContainer<NeuroContainerItems>({
     injectionMode: InjectionMode.PROXY,
@@ -54,5 +57,6 @@ export const createNeuroContainer = ({
       () => new Semaphore(maxConcurrentRugptRequests),
     ).singleton(),
     logger: asValue(logger),
+    localeStore: asValue(localeStore),
   })
 }

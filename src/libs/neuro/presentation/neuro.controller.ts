@@ -5,6 +5,7 @@ import {
   createNeuroContainer,
   NeuroContainerItems,
 } from '@/libs/neuro/infrastructure'
+import { LocaleStore } from '@/libs/shared/intl'
 import { Controller, Logger } from '@/libs/shared/workflow'
 
 import { DalleHandler, RugptHandler } from './handlers'
@@ -12,6 +13,7 @@ import { DalleHandler, RugptHandler } from './handlers'
 export type NeuroControllerDeps = {
   logger: Logger
   bot: Bot
+  localeStore: LocaleStore
 }
 
 export class NeuroController implements Controller {
@@ -26,6 +28,7 @@ export class NeuroController implements Controller {
 
       deps: {
         logger: this._deps.logger,
+        localeStore: this._deps.localeStore,
       },
     })
 

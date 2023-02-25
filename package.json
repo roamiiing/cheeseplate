@@ -49,6 +49,7 @@
     "tsconfig-paths": "^4.1.2",
     "tsup": "^6.2.3",
     "typescript": "^4.5.4",
+    "vite-tsconfig-paths": "^4.0.5",
     "vitest": "^0.26.3",
     "yargs": "^17.6.0",
     "zx": "^7.1.1"

@@ -10,8 +10,11 @@ import { Bot, BotError } from 'grammy'
 import { ChatsController, ChatsControllerDeps } from '@/libs/chats/presentation'
 import { NeuroController, NeuroControllerDeps } from '@/libs/neuro/presentation'
 import { CacheMemory } from '@/libs/shared/cache-memory'
+import { LocaleStoreImpl } from '@/libs/shared/intl'
 import { ConsolaLogger } from '@/libs/shared/loggers'
 import { Controller, ScopedLogger } from '@/libs/shared/workflow'
+
+import locale from '../../data/locale.json'
 
 export type RootContainerItems = {
   neuroController: Controller
@@ -26,6 +29,8 @@ export class RootController implements Controller {
   private readonly _logger = new ConsolaLogger({
     isProduction: process.env.NODE_ENV === 'production',
   })
+
+  private readonly _localeStore = new LocaleStoreImpl().load(locale)
 
   private _me: UserFromGetMe | null = null
 
@@ -62,6 +67,7 @@ export class RootController implements Controller {
   private _scaffoldContainer(): void {
     this._container.register({
       bot: asValue(this._bot),
+      localeStore: asValue(this._localeStore),
       cache: asValue(new CacheMemory({}, this._logger)),
       logger: asValue(this._logger),
 

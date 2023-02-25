@@ -28,5 +28,6 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    include: [path.resolve(__dirname, '../src/**/*.{test,spec}.ts')],
   },
 })
