@@ -5,7 +5,7 @@ import { Context } from 'grammy'
 import { RugptStatus } from '@/libs/neuro/application'
 import { RugptPrompt } from '@/libs/neuro/domain'
 import { NeuroContainerItems } from '@/libs/neuro/infrastructure'
-import { stripFirst } from '@/libs/shared/strings'
+import { escapeAll, stripFirst } from '@/libs/shared/strings'
 import { mapZodError } from '@/libs/shared/validation'
 import { ScopedLogger } from '@/libs/shared/workflow'
 
@@ -65,7 +65,7 @@ export class RugptHandler {
             }
 
             case RugptStatus.Text: {
-              await ctx.reply(output.text, {
+              await ctx.reply(escapeAll(output.text), {
                 reply_to_message_id: ctx.message?.message_id,
               })
 
