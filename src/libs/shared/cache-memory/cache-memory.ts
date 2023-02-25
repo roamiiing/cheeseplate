@@ -1,3 +1,5 @@
+import * as crypto from 'crypto'
+
 import { defu } from 'defu'
 import bjson from 'json-bigint'
 
@@ -18,6 +20,8 @@ export class CacheMemory implements Cache {
     this._options = defu(options, {
       ttl: Time(5, 'h'),
     })
+
+    this._delimeter = `///<*><#><@><*>CACHE_DELIMETER!!!${crypto.randomUUID()}!!!CACHE_DELIMETER<&><^><%><$>\\\\\\`
   }
 
   memoize<T, R>(
@@ -28,15 +32,15 @@ export class CacheMemory implements Cache {
     const resultOptions = defu(options, this._options)
 
     const wrappedFn = async (arg: T): Promise<R> => {
-      const key = CacheMemory._getMapKey(fnName, arg)
+      const key = this._getMapKey(fnName, arg)
 
       if (this._map.has(key)) {
-        this._logger?.info('Taken from cache:', key)
+        this._logger?.debug('Taken from cache:', key)
 
         return this._map.get(key) as R
       }
 
-      this._logger?.info('Cache miss:', key)
+      this._logger?.debug('Cache miss:', key)
 
       const result = await fn(arg)
       this._map.set(key, result)
@@ -53,7 +57,7 @@ export class CacheMemory implements Cache {
 
   async invalidate(fnName: string): Promise<void> {
     for (const key of this._map.keys()) {
-      const fnNameFromKey = CacheMemory._getFnNameFromKey(key)
+      const fnNameFromKey = this._getFnNameFromKey(key)
 
       if (fnName === fnNameFromKey) {
         this._map.delete(key)
@@ -71,14 +75,18 @@ export class CacheMemory implements Cache {
 
   private _map = new Map<string, unknown>()
 
-  private static readonly _delimeter = '//CACHE_DELIMETER//'
+  /**
+   * Delimeter for cache key. It's used to split key into fnName and arg.
+   * For security reasons, it's generated randomly on each app start.
+   */
+  private readonly _delimeter
 
-  private static _getMapKey(fnName: string, arg: unknown): string {
-    return `${fnName}${CacheMemory._delimeter}${bjson.stringify(arg)}`
+  private _getMapKey(fnName: string, arg: unknown): string {
+    return `${fnName}${this._delimeter}${bjson.stringify(arg)}`
   }
 
-  private static _getFnNameFromKey(key: string): string | undefined {
-    return key.split(CacheMemory._delimeter).at(0)
+  private _getFnNameFromKey(key: string): string | undefined {
+    return key.split(this._delimeter).at(0)
   }
 
   private get _logger(): ScopedLogger | undefined {
