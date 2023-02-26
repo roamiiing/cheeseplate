@@ -27,7 +27,10 @@ export const processResult = (
   queue.enqueue(
     ctx.message?.chat.id ?? Infinity,
     async () => {
-      const { notify = false, cleanupMessages = true } = result?.options ?? {}
+      const {
+        notify = false,
+        // cleanupMessages = true,
+      } = result?.options ?? {}
 
       const sentMessages: Message[] = []
 

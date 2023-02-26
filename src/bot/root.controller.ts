@@ -9,6 +9,10 @@ import { Bot, BotError } from 'grammy'
 
 import { ChatsController, ChatsControllerDeps } from '@/libs/chats/presentation'
 import { NeuroController, NeuroControllerDeps } from '@/libs/neuro/presentation'
+import {
+  RandomController,
+  RandomControllerDeps,
+} from '@/libs/random/presentation'
 import { CacheMemory } from '@/libs/shared/cache-memory'
 import { LocaleStoreImpl } from '@/libs/shared/intl'
 import { ConsolaLogger } from '@/libs/shared/loggers'
@@ -19,8 +23,10 @@ import locale from '../../data/locale.json'
 export type RootContainerItems = {
   neuroController: Controller
   chatsController: Controller
+  randomController: Controller
 } & NeuroControllerDeps &
-  ChatsControllerDeps
+  ChatsControllerDeps &
+  RandomControllerDeps
 
 export class RootController implements Controller {
   private readonly _container = createContainer<RootContainerItems>()
@@ -40,6 +46,7 @@ export class RootController implements Controller {
 
     this._container.cradle.chatsController.register()
     this._container.cradle.neuroController.register()
+    this._container.cradle.randomController.register()
   }
 
   public async run(): Promise<RunnerHandle> {
@@ -73,7 +80,10 @@ export class RootController implements Controller {
 
       prismaClient: asValue(
         new PrismaClient({
-          log: ['query', 'info', 'warn'],
+          log:
+            process.env.NODE_ENV === 'production'
+              ? []
+              : ['query', 'info', 'warn'],
           errorFormat: 'pretty',
           datasources: {
             db: {
@@ -84,6 +94,7 @@ export class RootController implements Controller {
       ),
       neuroController: asClass(NeuroController).singleton(),
       chatsController: asClass(ChatsController).singleton(),
+      randomController: asClass(RandomController).singleton(),
     })
   }
 

@@ -1,5 +1,4 @@
 import { getRandomFromArray } from '@/libs/shared/random'
-import { UseCase } from '@/libs/shared/workflow'
 
 const BEN_GIFS = [
   'https://c.tenor.com/eW6zRrKEuIYAAAAC/yes-ben.gif', // yes
@@ -11,17 +10,12 @@ const BEN_GIFS = [
 
 const GIFS_PROBABILITIES = [0.47, 0.47, 0.02, 0.02, 0.02]
 
-export const BEN_COMMAND = '/ben'
+export type BenUseCase = () => Promise<{ gif: string }>
 
-export type BenInput = void
-
-export const benUseCase = (): UseCase<BenInput> => async () => {
+export const benUseCase = (): BenUseCase => async () => {
   const gif = getRandomFromArray(BEN_GIFS, GIFS_PROBABILITIES)
 
   return {
     gif,
-    options: {
-      cleanupMessages: false,
-    },
   }
 }

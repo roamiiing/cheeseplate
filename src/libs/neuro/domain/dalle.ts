@@ -2,10 +2,10 @@ import { z } from 'zod'
 
 export const DallePrompt = z
   .string({
-    required_error: 'А текст написать? /dalle <b>ваш текст здесь</b>',
+    required_error: 'dalle.errors.prompt.required',
   })
-  .min(2, 'Слишком мало текста, минимум 2 символа')
-  .max(200, 'Слишком много текста, максимум 200 символов')
+  .min(1, 'dalle.errors.prompt.required')
+  .max(500, 'dalle.errors.prompt.max')
   .transform(val => val.replace(/\s/g, ' '))
   .brand('DallePrompt')
 

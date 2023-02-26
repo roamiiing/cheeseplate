@@ -1,5 +1,7 @@
 #!/usr/bin/env zx
 
+/* eslint-disable */
+
 /*
  * This script is needed to send commands to BotFather
  * npm run botfather-commands

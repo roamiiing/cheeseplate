@@ -4,10 +4,10 @@ import { stripAfter } from '@/libs/shared/strings'
 
 export const RugptPrompt = z
   .string({
-    required_error: 'А текст написать? /rugpt <b>ваш текст здесь</b>',
+    required_error: 'errors.prompt.required',
   })
-  .min(2, 'Слишком мало текста, минимум 2 символа')
-  .max(200, 'Слишком много текста, максимум 200 символов')
+  .min(1, 'errors.prompt.required')
+  .max(500, 'errors.prompt.max')
   .transform(val => val.replace(/\s/g, ' '))
   .brand('RugptPrompt')
 

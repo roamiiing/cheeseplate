@@ -1,34 +1,24 @@
 import { gcd } from '@/libs/shared/math'
-import { UseCase } from '@/libs/shared/workflow'
 
-import { rollReplica } from '../replicas'
-
-export const ROLL_COMMAND = '/roll'
-
-export type RollInput = {
-  message?: string
+export type RollOutput = {
+  parts: number
+  of: number
+  prob: number
 }
 
-export const rollUseCase =
-  (): UseCase<RollInput> =>
-  async ({ input: { message } }) => {
-    const prob = Math.round(Math.random() * 100)
+export type RollUseCase = () => Promise<RollOutput>
 
-    const divider = gcd(prob, 100)
-    const fraction = `${prob / divider} случаев из ${100 / divider}`
+export const rollUseCase = (): RollUseCase => async () => {
+  const prob = Math.round(Math.random() * 100)
 
-    if (!message)
-      return {
-        message: `${prob}%`,
-        options: {
-          cleanupMessages: false,
-        },
-      }
+  const divider = gcd(prob, 100)
 
-    return {
-      message: rollReplica({ message, prob: prob.toString(10), fraction }),
-      options: {
-        cleanupMessages: false,
-      },
-    }
+  const parts = prob / divider
+  const of = 100 / divider
+
+  return {
+    prob,
+    parts,
+    of,
   }
+}

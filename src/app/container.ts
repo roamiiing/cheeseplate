@@ -11,7 +11,6 @@ import { Telegraf } from 'telegraf'
 
 import { configureChats } from '@/libs/chats/infrastructure'
 import { configureGeneral } from '@/libs/general/infrastructure'
-import { configureRandom } from '@/libs/random/infrastructure'
 import { CheeseBot } from '@/libs/shared/bot'
 import { CacheMemory } from '@/libs/shared/cache-memory'
 import { Queue } from '@/libs/shared/queue'
@@ -28,7 +27,6 @@ type ConfigureModulesDeps = {
   configureGeneral: ReturnType<typeof configureGeneral>
   configureUsers: ReturnType<typeof configureUsers>
   configureTags: ReturnType<typeof configureTags>
-  configureRandom: ReturnType<typeof configureRandom>
 }
 
 const configureModules =
@@ -37,7 +35,6 @@ const configureModules =
     configureGeneral,
     configureUsers,
     configureTags,
-    configureRandom,
   }: ConfigureModulesDeps) =>
   (
     featuresMask = Module.General | Module.Users | Module.Tags | Module.Random,
@@ -51,7 +48,6 @@ const configureModules =
           [Module.General]: configureGeneral,
           [Module.Users]: configureUsers,
           [Module.Tags]: configureTags,
-          [Module.Random]: configureRandom,
         }[module]()),
       ),
     )
@@ -82,7 +78,6 @@ export const createAppContainer = () =>
     configureGeneral: asFunction(configureGeneral),
     configureUsers: asFunction(configureUsers),
     configureTags: asFunction(configureTags),
-    configureRandom: asFunction(configureRandom),
 
     configureModules: asFunction(configureModules),
   })

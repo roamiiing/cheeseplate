@@ -1,1 +1,1 @@
-export * from './random.controller'
+export * from './random.container'

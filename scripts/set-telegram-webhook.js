@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const yargs = require('yargs')
 const { hideBin } = require('yargs/helpers')
 const { Telegraf } = require('telegraf')

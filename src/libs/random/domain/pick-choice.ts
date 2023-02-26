@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-export const PickChoice = z.string().min(1).max(50)
+export const PickChoice = z
+  .string()
+  .min(1, 'pick.errors.choice.min')
+  .max(500, 'pick.errors.choice.max')
 export type PickChoice = z.infer<typeof PickChoice>
 
 export const PickChoicesArray = z
   .array(PickChoice)
-  .min(
-    2,
-    'Укажите <b>как минимум 2</b> выбора. Выборы разделяйте либо запятыми, либо начинайте каждый выбор с новой строки',
-  )
-  .max(50)
+  .min(2, 'pick.errors.choices.min')
+  .max(50, 'pick.errors.choices.max')
 export type PickChoicesArray = z.infer<typeof PickChoicesArray>

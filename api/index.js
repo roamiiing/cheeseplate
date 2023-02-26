@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const { webhook } = require('../dist/serverless')
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))

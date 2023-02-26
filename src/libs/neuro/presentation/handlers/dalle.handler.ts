@@ -7,7 +7,7 @@ import { DallePrompt } from '@/libs/neuro/domain'
 import { NeuroContainerItems } from '@/libs/neuro/infrastructure'
 import { joinImages } from '@/libs/shared/images'
 import { stripFirst } from '@/libs/shared/strings'
-import { mapZodError } from '@/libs/shared/validation'
+import { mapLocalizedZodError } from '@/libs/shared/validation'
 import { ScopedLogger } from '@/libs/shared/workflow'
 
 export class DalleHandler {
@@ -31,8 +31,9 @@ export class DalleHandler {
       const validatedPrompt = await DallePrompt.safeParseAsync(prompt)
 
       if (!validatedPrompt.success) {
-        return await ctx.reply(mapZodError(validatedPrompt.error), {
+        return await ctx.reply(mapLocalizedZodError(t)(validatedPrompt.error), {
           reply_to_message_id: ctx.message?.message_id,
+          parse_mode: 'HTML',
         })
       }
 
@@ -84,7 +85,7 @@ export class DalleHandler {
           )
         }
       } catch (error) {
-        await ctx.reply(t.get('dalle.error'), {
+        await ctx.reply(t.get('dalle.errors.unknown'), {
           reply_to_message_id: ctx.message?.message_id,
           disable_notification: true,
         })
