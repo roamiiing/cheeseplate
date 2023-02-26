@@ -11,7 +11,7 @@ export class ConsolaLogger implements Logger {
 
   constructor({ isProduction = false }: ConsolaLoggerConfig) {
     this._logger = new Consola({
-      level: LogLevel.Verbose,
+      level: isProduction ? LogLevel.Info : LogLevel.Verbose,
       reporters: [isProduction ? new JSONReporter() : new FancyReporter()],
     })
   }
