@@ -34,6 +34,7 @@ export class RootController implements Controller {
   private readonly _bot = new Bot(process.env.TG_BOT_TOKEN ?? '')
   private readonly _logger = new ConsolaLogger({
     isProduction: process.env.NODE_ENV === 'production',
+    sentryDsn: process.env.SENTRY_DSN || undefined,
   })
 
   private readonly _localeStore = new LocaleStoreImpl().load(locale)
@@ -145,6 +146,7 @@ export class RootController implements Controller {
 
   private _handleError(err: BotError): void {
     this._scopedLogger.error(err.message, err)
+    this._scopedLogger.captureException(err)
   }
 
   private get _scopedLogger(): ScopedLogger {
