@@ -1,0 +1,42 @@
+{
+    "tasks": {
+        "dev": "DENO_ENV=development deno run --allow-read --allow-env --allow-net --watch apps/cheeseplate/main.ts",
+        "start": "DENO_ENV=production deno run --allow-read --allow-env --allow-net apps/cheeseplate/main.ts"
+    },
+    "fmt": {
+        "semiColons": false,
+        "singleQuote": true,
+        "indentWidth": 4,
+        "lineWidth": 120
+    },
+    "imports": {
+        "std/": "https://deno.land/std@0.191.0/",
+        "grammy": "https://deno.land/x/grammy@v1.16.1/mod.ts",
+        "grammy_runner": "https://deno.land/x/grammy_runner@v2.0.3/mod.ts",
+        "grammy_types": "https://deno.land/x/grammy_types@v3.1.1/mod.ts",
+        "grammy_transformer_throttler": "https://deno.land/x/grammy_transformer_throttler@v1.2.1/mod.ts",
+        "grammy_auto_retry": "npm:@grammyjs/auto-retry@^1.1.1",
+        "grammy_ratelimiter": "https://deno.land/x/grammy_ratelimiter@v1.1.6/mod.ts",
+        "mongoose": "npm:mongoose@^7.2.2",
+        "typegoose": "npm:@typegoose/typegoose@^11.2.0",
+        "zod": "https://deno.land/x/zod@v3.21.4/mod.ts",
+        "handlebars": "npm:handlebars@^4.7.7",
+        "awilix": "npm:awilix@^8.0.1",
+        "axios": "npm:axios@^1.4.0",
+
+        "shared/guards": "./libs/shared/guards/mod.ts",
+        "shared/random": "./libs/shared/random/mod.ts",
+        "shared/strings": "./libs/shared/strings/mod.ts",
+        "shared/locales": "./libs/shared/locales/mod.ts",
+        "shared/fs": "./libs/shared/fs/mod.ts",
+        "shared/validation": "./libs/shared/validation/mod.ts",
+        "shared/workflow": "./libs/shared/workflow/mod.ts",
+        "shared/http": "./libs/shared/http/mod.ts",
+        "shared/math": "./libs/shared/math/mod.ts",
+
+        "misc/domain": "./libs/misc/domain/mod.ts",
+        "misc/application": "./libs/misc/application/mod.ts",
+        "misc/infrastructure": "./libs/misc/infrastructure/mod.ts",
+        "misc/presentation": "./libs/misc/presentation/mod.ts"
+    }
+}
