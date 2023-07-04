@@ -5,7 +5,7 @@ export const KandinskyPrompt = z
         required_error: 'kandinsky.errors.prompt.required',
     })
     .min(1, 'kandinsky.errors.prompt.required')
-    .max(500, 'kandinsky.errors.prompt.max')
+    .max(5000, 'kandinsky.errors.prompt.max')
     .transform((val) => val.replace(/\s/g, ' '))
     .brand('KandinskyPrompt')
 
