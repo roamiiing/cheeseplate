@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios'
 import { Bot } from 'grammy'
 import { run } from 'grammy_runner'
 import { error, info, setup } from 'std/log/mod.ts'
@@ -26,11 +27,22 @@ const registerables = [
     container.cradle.registerBenHandler,
     container.cradle.registerRollHandler,
     container.cradle.registerPickHandler,
+    container.cradle.registerKandinskyHandler,
 ]
 
 registerables.forEach((register) => register(bot))
 
 bot.catch((err) => {
+    const originalError = err.error ?? err
+
+    if (originalError instanceof AxiosError) {
+        return error('Axios error', {
+            message: originalError.message,
+            response: originalError.response?.data,
+            botError: err,
+        })
+    }
+
     error(err)
 })
 

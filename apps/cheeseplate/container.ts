@@ -1,34 +1,53 @@
-import { asFunction, asValue, AwilixContainer, createContainer } from 'awilix'
-import { FsLocaleStore, LocaleStore } from 'shared/locales'
+import { asFunction, asValue, AwilixContainer, createContainer, Resolver } from 'awilix'
+import { FsLocaleStore, LocaleStoreInjection } from 'shared/locales'
 import {
     RegisterBenHandler,
     registerBenHandler,
     RegisterDalleHandler,
     registerDalleHandler,
+    registerKandinskyHandler,
     RegisterPickHandler,
     registerPickHandler,
     RegisterRollHandler,
     registerRollHandler,
 } from 'misc/presentation'
-import { DalleDeps, DalleUseCase, dalleUseCase } from 'misc/application'
-import { requestDalleMiniImages } from 'misc/infrastructure'
+import {
+    DalleDeps,
+    DalleUseCase,
+    dalleUseCase,
+    KandinskySemaphoreInjection,
+    kandinskyUseCase,
+    KandinskyUseCaseInjection,
+    RequestKandinskyImagesInjection,
+} from 'misc/application'
+import { requestDalleMiniImages, requestKandinskyImages } from 'misc/infrastructure'
 import { Semaphore } from 'shared/workflow'
 
 const MAX_DALLE_CONCURRENCY = 10
+const MAX_KANDINSKY_CONCURRENCY = 10
 
-export type AppContainer = {
-    localeStore: LocaleStore
+export type AppContainer =
+    & LocaleStoreInjection
+    & RequestKandinskyImagesInjection
+    & KandinskySemaphoreInjection
+    & KandinskyUseCaseInjection
+    & {
+        dalleUseCase: DalleUseCase
+        requestDalleMiniImages: DalleDeps['requestDalleMiniImages']
+        dalleSemaphore: DalleDeps['dalleSemaphore']
+        registerDalleHandler: RegisterDalleHandler
 
-    dalleUseCase: DalleUseCase
-    requestDalleMiniImages: DalleDeps['requestDalleMiniImages']
-    dalleSemaphore: DalleDeps['dalleSemaphore']
-    registerDalleHandler: RegisterDalleHandler
+        registerBenHandler: RegisterBenHandler
 
-    registerBenHandler: RegisterBenHandler
+        registerRollHandler: RegisterRollHandler
 
-    registerRollHandler: RegisterRollHandler
+        registerPickHandler: RegisterPickHandler
 
-    registerPickHandler: RegisterPickHandler
+        registerKandinskyHandler: RegisterPickHandler
+    }
+
+type StrictNameAndRegistrationPair<T> = {
+    [U in keyof T]: Resolver<T[U]>
 }
 
 export const createAppContainer = async (isDev = false): Promise<AwilixContainer<AppContainer>> => {
@@ -36,20 +55,28 @@ export const createAppContainer = async (isDev = false): Promise<AwilixContainer
 
     const localeStore = await FsLocaleStore.create('locales', isDev)
 
-    container.register({
-        localeStore: asValue(localeStore),
+    container.register(
+        {
+            localeStore: asValue(localeStore),
 
-        dalleUseCase: asFunction(dalleUseCase).singleton(),
-        requestDalleMiniImages: asValue(requestDalleMiniImages),
-        dalleSemaphore: asValue(new Semaphore(MAX_DALLE_CONCURRENCY)),
-        registerDalleHandler: asFunction(registerDalleHandler).singleton(),
+            dalleUseCase: asFunction(dalleUseCase).singleton(),
+            requestDalleMiniImages: asValue(requestDalleMiniImages),
+            dalleSemaphore: asValue(new Semaphore(MAX_DALLE_CONCURRENCY)),
+            registerDalleHandler: asFunction(registerDalleHandler).singleton(),
 
-        registerBenHandler: asValue(registerBenHandler),
+            kandinskyUseCase: asFunction(kandinskyUseCase).singleton(),
+            kandinskySemaphore: asValue(new Semaphore(MAX_KANDINSKY_CONCURRENCY)),
+            requestKandinskyImages: asValue(requestKandinskyImages),
 
-        registerRollHandler: asFunction(registerRollHandler),
+            registerBenHandler: asValue(registerBenHandler),
 
-        registerPickHandler: asFunction(registerPickHandler),
-    })
+            registerRollHandler: asFunction(registerRollHandler),
+
+            registerPickHandler: asFunction(registerPickHandler),
+
+            registerKandinskyHandler: asFunction(registerKandinskyHandler),
+        } satisfies StrictNameAndRegistrationPair<AppContainer>,
+    )
 
     return container
 }

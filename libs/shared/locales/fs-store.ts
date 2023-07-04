@@ -23,6 +23,7 @@ const processTree = (
                         html
                             .trim()
                             .replaceAll('\n', ' ')
+                            .replaceAll('<br />', '\n\n')
                     ),
             )
         } else {
