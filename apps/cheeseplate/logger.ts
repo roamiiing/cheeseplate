@@ -1,7 +1,9 @@
 import { handlers } from 'std/log/mod.ts'
 import { exists } from 'shared/guards'
 
-const replacer = (_key: string, value: unknown) => {
+const replacer = (key: string, value: unknown) => {
+    if (key.toLocaleLowerCase().includes('stack')) return value
+
     const length = typeof value === 'object' && exists(value) && Object.keys(value).length
 
     if (length !== false && length > 500) {
