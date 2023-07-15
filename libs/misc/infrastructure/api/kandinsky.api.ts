@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { decode as base64Decode } from 'std/encoding/base64.ts'
 import { Buffer } from 'std/streams/buffer.ts'
-import { error, info } from 'std/log/mod.ts'
-import { createFakeHeaders, jsonToFormData } from 'shared/http'
+import { info } from 'std/log/mod.ts'
+import { createFakeHeaders } from 'shared/http'
 import { ValueOf } from 'shared/di'
 import { retryUntil } from 'shared/workflow'
 import { KandinskyStyle } from 'misc/domain'
@@ -11,32 +11,29 @@ import { RequestKandinskyImagesInjection } from 'misc/application'
 const { Values } = KandinskyStyle
 
 const STYLE_TO_PROMPT: Record<KandinskyStyle, string> = {
-    [Values['3d']]: 'Unreal Engine rendering, 3d render, photorealistic, digital concept art, octane render, 4k HD',
-    [Values.detailed]: '4k, ultra HD, detailed phot',
-    [Values.aivazovsky]: 'painted by Aivazovsky',
-    [Values.anime]: 'in anime style',
-    [Values.cartoon]: 'as cartoon, picture from cartoon',
-    [Values.christmas]: 'christmas, winter, x-mas, decorations, new year eve, snowflakes, 4k',
-    [Values.classicism]: 'classicism painting, 17th century, trending on artstation, baroque painting',
-    [Values.cyberpunk]: 'in cyberpunk style, futuristic cyberpunk',
-    [Values.digital]:
-        'high quality, highly detailed, concept art, digital painting, by greg rutkowski trending on artstation',
-    [Values.goncharova]: 'painted by Goncharova, Russian avant-garde, futurism, cubism, suprematism',
-    [Values.iconography]: 'in the style of a wooden christian medieval icon in the church',
-    [Values.kandinsky]: 'painted by Vasily Kandinsky, abstractionis',
-    [Values.khokhloma]: 'in Russian style, Khokhloma, 16th century, marble, decorative, realistic',
-    [Values.malevich]:
-        'Malevich, suprematism, avant-garde art, 20th century, geometric shapes , colorful, Russian avant-garde',
-    [Values.medieval]: 'medieval painting, 15th century, trending on artstation',
-    [Values.mosaic]: 'as tile mosaic',
-    [Values.oil]: 'like oil painting',
-    [Values.picasso]: 'Cubist painting by Pablo Picasso, 1934, colorful',
-    [Values.pencil]: 'pencil art, pencil drawing, highly detailed',
-    [Values.portrait]: '50mm portrait photography, hard rim lighting photography',
-    [Values.renaissance]: 'painting, renaissance old master royal collection, artstation',
-    [Values.soviet]: 'picture from soviet cartoons',
-    [Values.studio]:
-        'glamorous, emotional ,shot in the photo studio, professional studio lighting, backlit, rim lighting, 8k',
+    [Values['3d']]: 'RENDER',
+    [Values.detailed]: 'DETAILED',
+    [Values.aivazovsky]: 'AIVAZOVSKY',
+    [Values.anime]: 'ANIME',
+    [Values.cartoon]: 'CARTOON',
+    [Values.christmas]: 'CHRISTMAS',
+    [Values.classicism]: 'CLASSICISM',
+    [Values.cyberpunk]: 'CYBERPUNK',
+    [Values.digital]: 'DIGITAL',
+    [Values.goncharova]: 'GONCHAROVA',
+    [Values.iconography]: 'ICONOGRAPHY',
+    [Values.kandinsky]: 'KANDINSKY',
+    [Values.khokhloma]: 'KHOKHLOMA',
+    [Values.malevich]: 'MALEVICH',
+    [Values.medieval]: 'MEDIEVAL',
+    [Values.mosaic]: 'MOSAIC',
+    [Values.oil]: 'OIL',
+    [Values.picasso]: 'PICASSO',
+    [Values.pencil]: 'PENCIL',
+    [Values.portrait]: 'PORTRAIT',
+    [Values.renaissance]: 'RENAISSANCE',
+    [Values.soviet]: 'SOVIET',
+    [Values.studio]: 'STUDIO',
 }
 
 const TIMEOUT_MS = 60_000
@@ -45,7 +42,7 @@ const RETRY_PARAMS = {
     delayMs: 12_000,
 }
 
-const KANDINSKY_API_PREFIX = 'https://api.fusionbrain.ai/api/v1/text2image'
+const KANDINSKY_API_PREFIX = 'https://api.fusionbrain.ai/web/api/v1/text2image'
 
 const KANDINSKY_RUN_API_URL = `${KANDINSKY_API_PREFIX}/run`
 
@@ -58,32 +55,23 @@ const REQUEST_PARAMS = {
     timeout: TIMEOUT_MS,
 }
 
-const getStatusUrl = (pocket: string) => `${KANDINSKY_API_PREFIX}/generate/pockets/${pocket}/status`
-const getEntitiesUrl = (pocket: string) => `${KANDINSKY_API_PREFIX}/generate/pockets/${pocket}/entities`
+const getStatusUrl = (uuid: string) => `${KANDINSKY_API_PREFIX}/status/${uuid}`
 
-type KandinskyResponse<T> =
-    | {
-        success: true
-        result: T
-    }
-    | {
-        success: false
-    }
+type KandinskyInitialResponse = {
+    status: Status.Initial
+    uuid: string
+}
 
-type RunResponse = KandinskyResponse<{ pocketId: string }>
+type KandinskyDoneResponse = {
+    status: Status.Done
+    uuid: string
+    images: string[] // base64
+}
 
 const enum Status {
-    Processing = 'PROCESSING',
-    Success = 'SUCCESS',
+    Initial = 'INITIAL',
+    Done = 'DONE',
 }
-
-type StatusResponse = KandinskyResponse<Status>
-
-type ImageInstance = {
-    response: [string] // base64
-}
-
-type EntitiesResponse = KandinskyResponse<ImageInstance[]>
 
 export class InvalidKandinskyResponseError extends Error {
     constructor(private _response: unknown) {
@@ -94,46 +82,51 @@ export class InvalidKandinskyResponseError extends Error {
 export const requestKandinskyImages: ValueOf<RequestKandinskyImagesInjection> = async ({ prompt, style }) => {
     info('Requesting Kandinsky images for prompt', prompt)
 
-    const injectedStyle = style ? STYLE_TO_PROMPT[style] : ''
-    const injectedPrompt = injectedStyle ? `${prompt}, ${injectedStyle}` : prompt
+    const jsonData = {
+        type: 'GENERATE',
+        style: style ? STYLE_TO_PROMPT[style] : 'DEFAULT',
+        width: 1024,
+        height: 1024,
+        generateParams: {
+            query: prompt,
+        },
+    }
 
-    const { data: runResult } = await axios.post<RunResponse>(
+    const formData = new FormData()
+    const blob = new File([...JSON.stringify(jsonData)], 'blob', { type: 'application/json' })
+    formData.append('params', blob)
+
+    const { data: runResult } = await axios.post<KandinskyInitialResponse>(
         KANDINSKY_RUN_API_URL,
-        jsonToFormData({ queueType: 'generate', query: injectedPrompt, preset: '1', style: injectedStyle }),
+        formData,
         {
             headers: FAKE_API_HEADERS,
             timeout: TIMEOUT_MS,
+            params: {
+                model_id: '1',
+            },
         },
     )
 
-    if (!runResult.success) throw new InvalidKandinskyResponseError(runResult)
+    if (runResult.status !== Status.Initial) throw new InvalidKandinskyResponseError(runResult)
 
-    info('Received Kandinsky pocket id', runResult.result.pocketId)
+    const { uuid } = runResult
 
-    const { pocketId } = runResult.result
+    info('Received Kandinsky uuid', uuid)
 
     const { data: statusResult } = await retryUntil(
-        () => axios.get<StatusResponse>(getStatusUrl(pocketId), REQUEST_PARAMS),
-        ({ data }) => data.success && data.result === Status.Success,
+        () => axios.get<KandinskyDoneResponse>(getStatusUrl(uuid), REQUEST_PARAMS),
+        ({ data }) => data.status === Status.Done,
         RETRY_PARAMS,
     )
 
-    if (!statusResult.success) throw new InvalidKandinskyResponseError(statusResult)
-
-    info('Received Kandinsky status', statusResult.result)
-
-    const { data: entitiesResult } = await axios.get<EntitiesResponse>(getEntitiesUrl(pocketId), REQUEST_PARAMS)
-
-    if (!entitiesResult.success) throw new InvalidKandinskyResponseError(entitiesResult)
-
-    const { response } = entitiesResult.result[0]
-
-    if (!response || typeof response[0] !== 'string') {
-        error('Invalid Dalle response', entitiesResult)
-        throw new InvalidKandinskyResponseError(entitiesResult)
+    if (statusResult.status !== Status.Done || !Array.isArray(statusResult.images)) {
+        throw new InvalidKandinskyResponseError(statusResult)
     }
 
-    info('Received Kandinsky images', response.length)
+    const { images } = statusResult
 
-    return response.map((v) => new Buffer(base64Decode(v)))
+    info('Received Kandinsky images', images.length)
+
+    return images.map((v) => new Buffer(base64Decode(v)))
 }

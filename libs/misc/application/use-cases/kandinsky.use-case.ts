@@ -1,5 +1,5 @@
 import { Buffer } from 'std/streams/mod.ts'
-import { KandinskyInput } from 'misc/domain'
+import { getInjectedPrompt, KandinskyInput } from 'misc/domain'
 import { Semaphore } from 'shared/workflow'
 import { Injection } from 'shared/di'
 
@@ -50,7 +50,9 @@ export const kandinskyUseCase = ({
 
         yield { status: KandinskyStatus.Wait }
 
-        const images = await requestKandinskyImages({ style, prompt }).finally(release)
+        const injectedPrompt = getInjectedPrompt({ style, prompt })
+
+        const images = await requestKandinskyImages(injectedPrompt).finally(release)
 
         yield { status: KandinskyStatus.Images, images }
     }

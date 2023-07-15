@@ -2,7 +2,7 @@ import { Bot, InputFile } from 'grammy'
 import { Message } from 'grammy_types'
 import { info } from 'std/log/mod.ts'
 import { LocaleStoreInjection } from 'shared/locales'
-import { stripFirst } from 'shared/strings'
+import { parseCliArgs, stripFirst } from 'shared/strings'
 import { exists } from 'shared/guards'
 import { mapLocalizedZodError } from 'shared/validation'
 import { KandinskyInput } from 'misc/domain'
@@ -15,19 +15,18 @@ type KandinskyHandlerDeps =
 
 export type RegisterKandinskyHandler = (bot: Bot) => Bot
 
-const CMD_LINE_ARG = ['-s', '--style']
+const CMD_LINE_ARG = ['s', 'style']
 
 export const registerKandinskyHandler =
     ({ localeStore, kandinskyUseCase }: KandinskyHandlerDeps): RegisterKandinskyHandler => (bot: Bot) => {
         bot.command(['kandinsky', 'k'], async (ctx) => {
             const strippedMessage = stripFirst(ctx.message?.text ?? '')
 
-            const [styleArg, styleValue] = strippedMessage.split(/\s+/).slice(-2)
-
-            const style = CMD_LINE_ARG.includes(styleArg) ? styleValue : undefined
+            const args = parseCliArgs(strippedMessage)
+            const style = args.getByAliases(...CMD_LINE_ARG)?.toString().toLocaleLowerCase()
 
             const validatedInput = await KandinskyInput.safeParseAsync({
-                prompt: style ? strippedMessage.split(/\s+/).slice(0, -2).join(' ') : strippedMessage,
+                prompt: args.head,
                 style,
             })
 

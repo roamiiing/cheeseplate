@@ -30,8 +30,7 @@ const CLI_ARG = Re.sequence(
 const CLI_ARGS_HEAD = Re.sequence(
     Re.BEGIN,
     Re.ANYTHING.lazy().capture(),
-    Re.WHITESPACE.oneOrMore(),
-    CLI_ARG_BOUNDARY,
+    Re.WHITESPACE.oneOrMore().then(CLI_ARG_BOUNDARY).or(Re.END),
 )
 
 export const parseCliArgs = (message: string): ParsedCliArgs => {
