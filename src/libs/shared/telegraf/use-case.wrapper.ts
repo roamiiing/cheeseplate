@@ -16,15 +16,15 @@ export const wrapUseCase = async <Input>(
 ) => {
   const result = await useCase(mapContext(ctx)(input) as UseCaseContext<Input>)
 
-  processResult(result, ctx, queue)
+  await processResult(result, ctx, queue)
 }
 
-export const processResult = (
+export const processResult = async (
   result: UseCaseResult | undefined | null | never | void,
   ctx: Context,
   queue: Queue,
 ) => {
-  queue.enqueue(
+  await queue.enqueue(
     ctx.message?.chat.id ?? Infinity,
     async () => {
       const { notify = false, cleanupMessages = true } = result?.options ?? {}

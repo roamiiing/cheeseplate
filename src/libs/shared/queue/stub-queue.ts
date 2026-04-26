@@ -7,7 +7,7 @@ export class StubQueue implements Queue {
     _key: number,
     fn: QueuedFunction,
     _countsAs?: number | undefined,
-  ): void {
-    fn()
+  ): Promise<void> {
+    return fn().then(() => undefined)
   }
 }

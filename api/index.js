@@ -1,8 +1,9 @@
-const { webhook } = require('../dist/serverless')
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const { prismaClient, webhook } = require('../dist/serverless')
 
 module.exports = async (req, res) => {
-  webhook(req, res)
-  await sleep(5000)
+  try {
+    await webhook(req, res)
+  } finally {
+    await prismaClient.$disconnect().catch(() => {})
+  }
 }

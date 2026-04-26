@@ -1,6 +1,10 @@
 export type QueuedFunction = () => Promise<unknown>
 
 export interface Queue {
+  /**
+   * Resolves when `fn` has finished (StubQueue: immediately after `fn`;
+   * PromiseQueue: after the job is actually run and completes successfully).
+   */
   enqueue(
     key: number,
     fn: QueuedFunction,
@@ -10,5 +14,5 @@ export interface Queue {
      * all of them are considered as separate images
      */
     countsAs?: number,
-  ): void
+  ): Promise<void>
 }

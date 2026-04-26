@@ -1,4 +1,5 @@
 dist
+scripts
 ecosystem.config.js
 .prettierrc.js
 .eslintrc.js

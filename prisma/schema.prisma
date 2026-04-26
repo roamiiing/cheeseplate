@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Vercel/AWS use RHEL-style Linux; OpenSSL 3.2 at runtime maps to the 3.0 engine binary in Prisma 5+.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

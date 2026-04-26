@@ -27,6 +27,8 @@ type QueuedElement = {
   key: number
   countsAs: number
   fn: QueuedFunction
+  /** Fired when this job finishes successfully (after history accounting). */
+  resolveEnqueue?: () => void
 }
 
 export type History = HistoryItem[]
@@ -73,12 +75,15 @@ export class PromiseQueue implements Queue {
      * all of them are considered as separate images
      */
     countsAs = 1,
-  ) {
+  ): Promise<void> {
     console.log('Adding', key, 'to queue!')
-    this._queue.push({
-      key,
-      fn,
-      countsAs,
+    return new Promise(resolve => {
+      this._queue.push({
+        key,
+        fn,
+        countsAs,
+        resolveEnqueue: resolve,
+      })
     })
   }
 
@@ -139,6 +144,8 @@ export class PromiseQueue implements Queue {
                   this._queue.findIndex(p => p === v),
                   1,
                 )
+
+                v.resolveEnqueue?.()
 
                 setTimeout(() => {
                   this._history.splice(

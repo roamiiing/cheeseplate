@@ -50,39 +50,37 @@ export class TelegrafCheeseBot implements CheeseBot {
 
     let inProgress = 0
 
-    this._deps.bot.command(command, ctx => {
-      ;(async () => {
-        if (inProgress < maxInProgress) {
-          inProgress++
-          const message = ctx.message.text
+    this._deps.bot.command(command, async ctx => {
+      if (inProgress < maxInProgress) {
+        inProgress++
+        const message = ctx.message.text
 
-          try {
-            await wrapGeneratorUseCase(
-              ctx,
-              useCase,
-              this._deps.queue,
-              inputMapper({
-                rawMessage: message,
-                strippedMessage: stripFirst(message),
-              }),
-            )
-          } catch (e) {
-            console.error('Error with telegram answering', e)
-            captureException(e)
-          } finally {
-            inProgress--
-          }
-        } else {
-          processResult(
-            {
-              message:
-                'Прости, но не в этот раз :(\nЭта команда очень ресурсозатратная и сейчас очередь переполнена! Приходи позже 👻',
-            },
+        try {
+          await wrapGeneratorUseCase(
             ctx,
+            useCase,
             this._deps.queue,
+            inputMapper({
+              rawMessage: message,
+              strippedMessage: stripFirst(message),
+            }),
           )
+        } catch (e) {
+          console.error('Error with telegram answering', e)
+          captureException(e)
+        } finally {
+          inProgress--
         }
-      })()
+      } else {
+        await processResult(
+          {
+            message:
+              'Прости, но не в этот раз :(\nЭта команда очень ресурсозатратная и сейчас очередь переполнена! Приходи позже 👻',
+          },
+          ctx,
+          this._deps.queue,
+        )
+      }
     })
 
     return this

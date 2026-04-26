@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { Telegraf } from 'telegraf'
 
 import { Cache } from '@/libs/shared/workflow'
@@ -61,7 +60,7 @@ export const setUserName =
       })
     } catch (e) {
       // unique constraint violation (already exists)
-      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
         return {
           alreadyExists: true,
         }
