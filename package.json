@@ -1,0 +1,29 @@
+{
+  "name": "cheeseplate-next",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun --env-file=.env src/index.ts",
+    "start": "bun src/index.ts",
+    "test": "bun test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun src/db/migrate.ts",
+    "import:legacy": "bun src/scripts/import-legacy.ts"
+  },
+  "dependencies": {
+    "@grammyjs/types": "^3.20.0",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.4",
+    "grammy": "^1.33.0",
+    "https-proxy-agent": "^7.0.6",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/pg": "^8.11.10",
+    "drizzle-kit": "^0.30.2",
+    "pg": "^8.13.1",
+    "typescript": "^5.7.2"
+  }
+}

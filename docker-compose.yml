@@ -1,0 +1,15 @@
+services:
+  cheeseplate:
+    build: .
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      DATABASE_URL: file:/app/data/cheeseplate.sqlite
+      # HTTPS_PROXY: http://proxy:3128
+      # HTTP_PROXY: http://proxy:3128
+      # NO_PROXY: localhost,127.0.0.1
+    volumes:
+      - cheeseplate-data:/app/data
+
+volumes:
+  cheeseplate-data:

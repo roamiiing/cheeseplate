@@ -1,0 +1,11 @@
+node_modules
+.bun-install
+.bun-tmp
+data
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+coverage
+.env
+.env.*
+!.env.example
