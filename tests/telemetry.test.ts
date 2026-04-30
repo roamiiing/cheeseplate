@@ -82,3 +82,19 @@ test("raw Telegram transformer preserves response and records errors", async () 
   await expect((transformer as any)(async () => { throw new Error("telegram failed"); }, "deleteMessage", { chat_id: 1, message_id: 2 })).rejects.toThrow("telegram failed");
   expect(events.at(-1)!.name).toBe("telegram_api_error");
 });
+
+test("raw Telegram transformer skips getUpdates telemetry", async () => {
+  const events: Array<{ name: string; data?: Record<string, unknown>; project?: string }> = [];
+  const telemetry = {
+    track: (name: string, data?: Record<string, unknown>, project?: string) => events.push({ name, data, project }),
+    flush: async () => {},
+    stop: () => {},
+  };
+  const transformer = createRawTelegramTransformer(telemetry, "cheeseplate-raw-tg");
+  const response = { ok: true, result: [] } as const;
+
+  const result = await (transformer as any)(async () => response, "getUpdates", { timeout: 30 });
+
+  expect(result).toBe(response);
+  expect(events).toEqual([]);
+});

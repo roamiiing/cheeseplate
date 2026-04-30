@@ -93,13 +93,14 @@ const disabledTelemetry: Telemetry = {
 
 export function createRawTelegramTransformer(telemetry: Telemetry, rawProject: string): Transformer<RawApi> {
   return async (prev, method, payload, signal) => {
-    telemetry.track("telegram_api_request", { method, payload }, rawProject);
+    const shouldTrackRawApi = method !== "getUpdates";
+    if (shouldTrackRawApi) telemetry.track("telegram_api_request", { method, payload }, rawProject);
     try {
       const response = await prev(method, payload, signal);
-      telemetry.track("telegram_api_response", { method, response }, rawProject);
+      if (shouldTrackRawApi) telemetry.track("telegram_api_response", { method, response }, rawProject);
       return response;
     } catch (error) {
-      telemetry.track("telegram_api_error", { method, payload, error: serializeError(error) }, rawProject);
+      if (shouldTrackRawApi) telemetry.track("telegram_api_error", { method, payload, error: serializeError(error) }, rawProject);
       throw error;
     }
   };
