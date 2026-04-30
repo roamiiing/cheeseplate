@@ -3,9 +3,9 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 export type ProxyEnv = Record<string, string | undefined>;
 
 export function getProxyUrl(env: ProxyEnv = process.env, target = "https://api.telegram.org") {
-  const noProxy = env.NO_PROXY ?? env.no_proxy;
+  const noProxy = env.TG_NO_PROXY ?? env.tg_no_proxy;
   if (matchesNoProxy(noProxy, new URL(target).hostname)) return undefined;
-  return env.HTTPS_PROXY ?? env.https_proxy ?? env.HTTP_PROXY ?? env.http_proxy;
+  return env.TG_HTTPS_PROXY ?? env.tg_https_proxy ?? env.TG_HTTP_PROXY ?? env.tg_http_proxy;
 }
 
 export function proxyMode(env: ProxyEnv = process.env) {

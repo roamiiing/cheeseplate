@@ -5,9 +5,9 @@ services:
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
       DATABASE_URL: file:/app/data/cheeseplate.sqlite
-      # HTTPS_PROXY: http://proxy:3128
-      # HTTP_PROXY: http://proxy:3128
-      # NO_PROXY: localhost,127.0.0.1
+      # TG_HTTPS_PROXY: http://proxy:3128
+      # TG_HTTP_PROXY: http://proxy:3128
+      # TG_NO_PROXY: api.telegram.org
     volumes:
       - cheeseplate-data:/app/data
 

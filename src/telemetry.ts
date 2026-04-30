@@ -34,7 +34,7 @@ export function createTelemetry(input: {
   const disabled = input.disabled ?? process.env.TELEMETRY_DISABLED === "true";
   if (disabled) return disabledTelemetry;
 
-  const endpoint = input.endpoint ?? process.env.ROSSTAT_URL ?? "http://rosstat/events";
+  const endpoint = input.endpoint ?? "http://rosstat:80/events";
   const batchSize = input.batchSize ?? 50;
   const flushIntervalMs = input.flushIntervalMs ?? 1000;
   const fetchImpl = input.fetch ?? fetch;
