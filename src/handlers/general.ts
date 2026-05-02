@@ -1,5 +1,5 @@
 import { escapeHtml } from "../text";
-import type { Reply } from "./types";
+import { replyResult, type HandlerResult } from "./types";
 
 export const commands = [
   { command: "settag", description: "Установить себе тег", example: "/settag amogus" },
@@ -14,25 +14,31 @@ export const commands = [
   { command: "__debug", description: "Показать техническую информацию" },
 ];
 
-export function help(): Reply {
-  return {
-    text: commands
-      .map((item) => `/${item.command} - ${item.description}${item.example ? `\n<pre>${escapeHtml(item.example)}</pre>` : ""}`)
-      .join("\n\n"),
-  };
+export function help(chatId: number, fromId: number): HandlerResult {
+  return replyResult(
+    {
+      text: commands
+        .map((item) => `/${item.command} - ${item.description}${item.example ? `\n<pre>${escapeHtml(item.example)}</pre>` : ""}`)
+        .join("\n\n"),
+    },
+    [{ name: "help_requested", data: { fromId, chatId, commandCount: commands.length } }],
+  );
 }
 
-export function debug(startedAt: number, chatId: number, chatType: string, dbPath: string, proxyMode: string): Reply {
+export function debug(startedAt: number, chatId: number, fromId: number, chatType: string, dbPath: string, proxyMode: string): HandlerResult {
   const memory = process.memoryUsage();
   const uptime = Math.round((Date.now() - startedAt) / 1000);
-  return {
-    text: [
-      `chat id: <code>${chatId}</code>`,
-      `chat type: <code>${escapeHtml(chatType)}</code>`,
-      `uptime: <code>${uptime}s</code>`,
-      `rss: <code>${Math.round(memory.rss / 1024 / 1024)} MB</code>`,
-      `sqlite: <code>${escapeHtml(dbPath)}</code>`,
-      `proxy: <code>${escapeHtml(proxyMode)}</code>`,
-    ].join("\n"),
-  };
+  return replyResult(
+    {
+      text: [
+        `chat id: <code>${chatId}</code>`,
+        `chat type: <code>${escapeHtml(chatType)}</code>`,
+        `uptime: <code>${uptime}s</code>`,
+        `rss: <code>${Math.round(memory.rss / 1024 / 1024)} MB</code>`,
+        `sqlite: <code>${escapeHtml(dbPath)}</code>`,
+        `proxy: <code>${escapeHtml(proxyMode)}</code>`,
+      ].join("\n"),
+    },
+    [{ name: "debug_requested", data: { fromId, chatId, chatType, proxyMode, sqlitePath: dbPath } }],
+  );
 }

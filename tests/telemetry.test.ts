@@ -1,4 +1,6 @@
 import { expect, test } from "bun:test";
+import { send } from "../src/bot";
+import type { HandlerResult } from "../src/handlers";
 import { createRawTelegramTransformer, createTelemetry } from "../src/telemetry";
 
 test("telemetry buffers events and sends arrays", async () => {
@@ -97,4 +99,43 @@ test("raw Telegram transformer skips getUpdates telemetry", async () => {
 
   expect(result).toBe(response);
   expect(events).toEqual([]);
+});
+
+test("send tracks handler events without generic action telemetry", async () => {
+  const events: Array<{ name: string; data?: Record<string, unknown>; project?: string }> = [];
+  const replies: unknown[] = [];
+  const animations: string[] = [];
+  const telemetry = {
+    track: (name: string, data?: Record<string, unknown>, project?: string) => events.push({ name, data, project }),
+    flush: async () => {},
+    stop: () => {},
+  };
+  const ctx = {
+    reply: async (...args: unknown[]) => replies.push(args),
+    replyWithAnimation: async (gif: string) => animations.push(gif),
+  };
+  const result: HandlerResult = {
+    reply: { text: "hello", notify: true },
+    events: [{ name: "tag_set_requested", data: { chatId: 1, fromId: 2, tag: "dev" } }],
+  };
+
+  await send(ctx as any, telemetry, result);
+  await send(ctx as any, telemetry, { events: [{ name: "message_hashtags_seen", data: { chatId: 1, replied: false } }] });
+
+  expect(events).toEqual([
+    { name: "tag_set_requested", data: { chatId: 1, fromId: 2, tag: "dev" }, project: undefined },
+    { name: "message_hashtags_seen", data: { chatId: 1, replied: false }, project: undefined },
+  ]);
+  expect(events.map((event) => event.name)).not.toContain("action_reply");
+  expect(events.map((event) => event.name)).not.toContain("action_ignored");
+  expect(replies).toHaveLength(1);
+  expect(replies[0]).toEqual([
+    "hello",
+    {
+      parse_mode: "HTML",
+      disable_notification: false,
+      link_preview_options: { is_disabled: true },
+    },
+  ]);
+  expect(animations).toEqual([]);
 });

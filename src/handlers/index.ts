@@ -5,7 +5,7 @@ import { ben, pickChoice, roll } from "./random";
 import { deleteTag, dryPing, pingFromMessage, setTag, tagList } from "./tags";
 import { about, setName } from "./users";
 
-export type { MessageInput, Reply } from "./types";
+export type { BusinessTelemetryEvent, HandlerResult, MessageInput, Reply } from "./types";
 
 export function createCheeseHandlers(repo: CheeseRepository, random: Random = Math.random, startedAt = Date.now()) {
   return {
@@ -16,10 +16,10 @@ export function createCheeseHandlers(repo: CheeseRepository, random: Random = Ma
     tagList: (chatId: number) => tagList(repo, chatId),
     setName: (text: string, chatId: number, fromId: number) => setName(repo, random, text, chatId, fromId),
     about: (input: Parameters<typeof about>[2]) => about(repo, random, input),
-    roll: (text: string) => roll(random, text),
-    pick: (text: string) => pickChoice(random, text),
-    ben: () => ben(random),
+    roll: (text: string, chatId: number, fromId: number) => roll(random, text, chatId, fromId),
+    pick: (text: string, chatId: number, fromId: number) => pickChoice(random, text, chatId, fromId),
+    ben: (chatId: number, fromId: number) => ben(random, chatId, fromId),
     help,
-    debug: (chatId: number, chatType: string, dbPath: string, proxyMode: string) => debug(startedAt, chatId, chatType, dbPath, proxyMode),
+    debug: (chatId: number, fromId: number, chatType: string, dbPath: string, proxyMode: string) => debug(startedAt, chatId, fromId, chatType, dbPath, proxyMode),
   };
 }
